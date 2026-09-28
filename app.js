@@ -939,7 +939,7 @@ function detectPlatform(url) {
             icon: 'fa-brands fa-threads',
             cssClass: 'th',
             color: '#000000',
-            desc: 'التدوينات الإيمانية والخواطر التربوية في رحاب الساحة'
+            desc: 'الدرر الإيمانية والخواطر التربوية في رحاب الساحة'
         };
     }
     if (clean.includes('snapchat.com')) {
@@ -2734,7 +2734,7 @@ function showLocalFileBanner() {
                 <span>تصفح محلي (Offline)</span>
             </div>
             <p class="lfn-msg">
-                أنت تتصفح المدونة محلياً بكامل الدروس (31 فيديو) والأذكار والحكم. لتشغيل لوحة التحكم والمزامنة الكاملة، افتح عبر الخادم:
+                أنت تتصفح الموقع والمكتبة محلياً بكامل الدروس (31 فيديو) والأذكار والحكم. لتشغيل لوحة التحكم والمزامنة الكاملة، افتح عبر الخادم:
                 <a href="http://localhost:3000" target="_blank" rel="noopener">http://localhost:3000</a>
             </p>
             <button type="button" class="lfn-close" onclick="document.getElementById('localFileNoticeBanner').remove()" title="إغلاق التنبيه" aria-label="إغلاق">

@@ -1212,7 +1212,7 @@ async function saveHeroMediaSettings() {
             });
             const data = await res.json();
             if (data.success) {
-                showToast('تم حفظ إعدادات وسائط الهيرو بنجاح! تم تحديث المدونة فوراً. 🖼️', 'success');
+                showToast('تم حفظ إعدادات وسائط الهيرو بنجاح! تم تحديث الموقع فوراً. 🖼️', 'success');
                 return;
             }
         }
@@ -1611,7 +1611,7 @@ const SOCIAL_PLATFORM_CONFIGS = {
         cssClass: 'th',
         color: '#000000',
         placeholder: 'https://threads.net/@...',
-        desc: 'التدوينات الإيمانية والخواطر التربوية'
+        desc: 'الدرر الإيمانية والخواطر التربوية'
     },
     snapchat: {
         key: 'snapchat',
@@ -1822,7 +1822,7 @@ function addNewSocialLink(showSuccessToast = true) {
     // تفريغ حقل الرابط
     urlInput.value = '';
     if (showSuccessToast) {
-        showToast(`تمت إضافة منصة «${finalName}» وظهورها فوراً في المدونة! ✨`, 'success');
+        showToast(`تمت إضافة منصة «${finalName}» وظهورها فوراً في الموقع! ✨`, 'success');
     }
 }
 
@@ -1870,7 +1870,7 @@ function renderActiveSocialLinks() {
                                 <a href="${escapeHtml(item.url)}" target="_blank" rel="noopener" class="btn-visit-social" title="فتح واختبار الرابط في تبويب جديد">
                                     <i class="fa-solid fa-arrow-up-right-from-square"></i>
                                 </a>
-                                <button type="button" class="btn-remove-social" onclick="removeSocialLink('${item.id}')" title="مسح وحذف هذه المنصة فوراً من المدونة">
+                                <button type="button" class="btn-remove-social" onclick="removeSocialLink('${item.id}')" title="مسح وحذف هذه المنصة فوراً من الموقع">
                                     <i class="fa-solid fa-trash-can"></i> مسح
                                 </button>
                             </div>
@@ -1958,7 +1958,7 @@ async function persistActiveSocialLinks() {
 }
 
 /**
- * حذف رابط منصة من القائمة وحذفها فورياً من المدونة والخادم
+ * حذف رابط منصة من القائمة وحذفها فورياً من الموقع والخادم
  */
 window.removeSocialLink = async function(id) {
     const targetIdx = activeSocialLinks.findIndex(item => String(item.id) === String(id));
@@ -1969,7 +1969,7 @@ window.removeSocialLink = async function(id) {
     renderActiveSocialLinks();
 
     await persistActiveSocialLinks();
-    showToast(`تم مسح «${platformName}» وحذفها فوراً من المدونة! 🗑️`, 'success');
+    showToast(`تم مسح «${platformName}» وحذفها فوراً من الموقع! 🗑️`, 'success');
 };
 
 // ==========================================================================
