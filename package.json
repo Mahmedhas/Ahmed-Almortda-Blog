@@ -1,0 +1,19 @@
+{
+  "name": "sheikh-ahmed-murtada-blog",
+  "version": "2.0.0",
+  "description": "المدونة والمكتبة المرئية الرسمية لفضيلة الشيخ أحمد مرتضى حامد - Full-Stack Platform",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": [
+    "sheikh-ahmed-murtada",
+    "islamic-blog",
+    "luxor",
+    "youtube-sync",
+    "full-stack"
+  ],
+  "author": "Google Antigravity",
+  "license": "MIT"
+}

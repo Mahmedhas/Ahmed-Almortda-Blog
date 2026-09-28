@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة تحكم المدونة | فضيلة الشيخ أحمد مرتضى حامد</title>
+    <meta name="robots" content="noindex, nofollow">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="shortcut icon" href="favicon.ico">
+    
+    <!-- Google Fonts: Amiri & Cairo & Tajawal -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Cairo:wght@400;500;600;700;800;900&family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="style.css?v=6.7">
+    <link rel="stylesheet" href="admin.css?v=4.8">
+</head>
+<body class="admin-body">
+
+    <!-- Top Admin Header -->
+    <header class="admin-header">
+        <div class="container admin-nav-container">
+            <div class="admin-brand">
+                <div class="crest-icon">
+                    <i class="fa-solid fa-shield-halved"></i>
+                </div>
+                <div>
+                    <span class="brand-sub">نظام الإدارة المتكامل</span>
+                    <h1 class="brand-name">لوحة تحكم صرح الشيخ أحمد مرتضى</h1>
+                </div>
+            </div>
+
+            <div class="admin-header-actions">
+                <div class="server-status-pill" id="serverStatusBadge">
+                    <span class="pulse-dot"></span>
+                    <span id="serverStatusText">جاري الاتصال بالخادم...</span>
+                </div>
+
+                <button id="syncNowHeaderBtn" class="btn btn-gold btn-sm" title="مزامنة فورية من قناة يوتيوب">
+                    <i class="fa-solid fa-arrows-rotate sync-icon"></i>
+                    <span>مزامنة يوتيوب الآن</span>
+                </button>
+
+                <a href="index.html" class="btn btn-outline btn-sm" target="_blank" title="زيارة المدونة كزائر">
+                    <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                    <span>عرض المدونة</span>
+                </a>
+
+                <button id="adminLogoutBtn" class="btn btn-outline-danger btn-sm" title="تسجيل الخروج من لوحة التحكم">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                    <span>خروج</span>
+                </button>
+
+                <button id="themeToggleBtn" class="btn-icon theme-toggle" title="تبديل الثيم">
+                    <i class="fa-solid fa-moon theme-icon"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Admin Content Main -->
+    <main class="container admin-main">
+        
+        <!-- Welcome Banner -->
+        <section class="admin-welcome-card">
+            <div class="welcome-text">
+                <h2>أهلاً وسهلاً بفضيلة الشيخ وإدارة الساحة المباركة بالأقصر 🌿</h2>
+                <p>
+                    من هنا يمكنك إدارة كامل محتوى المدونة، متابعة التحديثات التلقائية لفيديوهات اليوتيوب فور نشرها، تعديل مواعيد لقاءات الساحة، وإضافة الدرر والمواعظ.
+                </p>
+            </div>
+        </section>
+
+        <!-- Stats Overview Cards -->
+        <section class="admin-stats-grid">
+            <div class="admin-stat-card">
+                <div class="stat-icon-wrap gold">
+                    <i class="fa-solid fa-video"></i>
+                </div>
+                <div class="stat-details">
+                    <span class="stat-num" id="statTotalVideos">--</span>
+                    <span class="stat-tit">إجمالي الدروس بالأرشيف</span>
+                </div>
+            </div>
+
+            <div class="admin-stat-card">
+                <div class="stat-icon-wrap emerald">
+                    <i class="fa-solid fa-satellite-dish"></i>
+                </div>
+                <div class="stat-details">
+                    <span class="stat-num" id="statSyncStatus">نشط تلقائياً</span>
+                    <span class="stat-tit" id="statLastSyncTime">آخر فحص: منذ قليل</span>
+                </div>
+            </div>
+
+            <div class="admin-stat-card">
+                <div class="stat-icon-wrap blue">
+                    <i class="fa-solid fa-eye"></i>
+                </div>
+                <div class="stat-details">
+                    <span class="stat-num" id="statTotalViews">--</span>
+                    <span class="stat-tit">إجمالي المشاهدات المسجلة</span>
+                </div>
+            </div>
+
+            <div class="admin-stat-card">
+                <div class="stat-icon-wrap purple">
+                    <i class="fa-solid fa-mosque"></i>
+                </div>
+                <div class="stat-details">
+                    <span class="stat-num">ساحة الأقصر</span>
+                    <span class="stat-tit">البث والتوثيق الأسبوعي</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tabs Navigation -->
+        <div class="admin-tabs-nav">
+            <button class="admin-tab-btn active" data-tab="tabVideos">
+                <i class="fa-solid fa-film"></i> إدارة الفيديوهات والدروس (<span id="tabVideosCount">0</span>)
+            </button>
+            <button class="admin-tab-btn" data-tab="tabSchedule">
+                <i class="fa-solid fa-calendar-days"></i> جدول لقاءات الساحة
+            </button>
+            <button class="admin-tab-btn" data-tab="tabQuotes">
+                <i class="fa-solid fa-feather"></i> درر ومواعظ الشيخ
+            </button>
+            <button class="admin-tab-btn" data-tab="tabSettings">
+                <i class="fa-solid fa-sliders"></i> إعدادات المنصات والوسائط
+            </button>
+            <button class="admin-tab-btn" data-tab="tabSecurity">
+                <i class="fa-solid fa-shield-halved"></i> أمان وبيانات الدخول
+            </button>
+        </div>
+
+        <!-- TAB 1: Videos Management -->
+        <section class="admin-tab-content active" id="tabVideos">
+            <div class="admin-panel-card">
+                <div class="panel-header-controls">
+                    <div class="admin-search-wrap">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <input type="text" id="adminSearchInput" placeholder="ابحث في الدروس المسجلة بالعنوان أو التاريخ..." class="form-control">
+                    </div>
+
+                    <div class="admin-filter-group">
+                        <select id="adminCategoryFilter" class="custom-select">
+                            <option value="all">جميع التصنيفات</option>
+                            <option value="ساحة_الأقصر">لقاءات الساحة بالأقصر</option>
+                            <option value="السيرة_النبوية">السيرة والشمائل المحمدية</option>
+                            <option value="تزكية_النفوس">تزكية القلوب والأخلاق</option>
+                            <option value="علوم_القرآن">تدبر القرآن الكريم</option>
+                            <option value="مناسبات_وأمسيات">مناسبات وأمسيات دينية</option>
+                            <option value="رقائق_وقصائر">رقائق ومواعظ قصيرة</option>
+                        </select>
+                    </div>
+
+                    <button id="triggerSyncBtn" class="btn btn-outline-gold btn-sm">
+                        <i class="fa-solid fa-arrows-rotate sync-icon"></i> جلب الفيديوهات الجديدة الآن
+                    </button>
+                </div>
+
+                <!-- Table of Videos with Responsive Scroll -->
+                <div class="table-scroll-hint">
+                    <i class="fa-solid fa-arrows-left-right"></i>
+                    <span>اسحب الجدول أفقياً لرؤية كافة التفاصيل والإجراءات</span>
+                </div>
+                <div class="admin-table-responsive">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 90px; min-width: 90px;">الغلاف</th>
+                                <th style="min-width: 280px;">عنوان الدرس والمحاضرة</th>
+                                <th style="min-width: 140px;">التصنيف</th>
+                                <th style="min-width: 130px;">تاريخ النشر</th>
+                                <th style="min-width: 85px;">المدة</th>
+                                <th style="min-width: 95px;">المشاهدات</th>
+                                <th style="width: 110px; min-width: 110px; text-align: center;">إجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody id="adminVideosTbody">
+                            <!-- Populated dynamically via admin.js -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 2: Saaha Schedule Management -->
+        <section class="admin-tab-content" id="tabSchedule">
+            <div class="admin-panel-card">
+                <div class="panel-title-bar">
+                    <h3><i class="fa-solid fa-calendar-check gold-icon"></i> تعديل مواعيد لقاءات ساحة الشيخ بالأقصر</h3>
+                    <p>المواعظ والمجالس المنشورة في الصفحة الرئيسية للمدونة</p>
+                </div>
+
+                <form id="scheduleForm" class="admin-form">
+                    <div class="schedule-edit-box">
+                        <h4><i class="fa-solid fa-calendar-day gold-icon"></i> لقاء الأحد الأسبوعي</h4>
+                        <div class="form-row">
+                            <div class="form-group col-half">
+                                <label>الموعد والتوقيت:</label>
+                                <input type="text" id="schedSundayTime" class="form-control" value="بعد صلاة العشاء مباشرة">
+                            </div>
+                            <div class="form-group col-half">
+                                <label>وصف مختصر للمجلس:</label>
+                                <input type="text" id="schedSundayDesc" class="form-control" value="المجلس العام بساحة الشيخ بالأقصر في تزكية النفس والسلوك بحضور كبار علماء الأزهر الشريف.">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="schedule-edit-box">
+                        <h4><i class="fa-solid fa-book-open gold-icon"></i> لقاء الأربعاء التربوي (السيرة النبوية)</h4>
+                        <div class="form-row">
+                            <div class="form-group col-half">
+                                <label>الموعد والتوقيت:</label>
+                                <input type="text" id="schedWedTime" class="form-control" value="بعد صلاة المغرب / العشاء">
+                            </div>
+                            <div class="form-group col-half">
+                                <label>وصف مختصر للمجلس:</label>
+                                <input type="text" id="schedWedDesc" class="form-control" value="مجلس خاص بمدارسة السيرة العطرة والتخلق بأخلاق المصطفى ﷺ في البيت والمجتمع.">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="schedule-edit-box">
+                        <h4><i class="fa-solid fa-map-location-dot gold-icon"></i> المجالس والزيارات الخارجية</h4>
+                        <div class="form-row">
+                            <div class="form-group col-half">
+                                <label>الموعد أو نطاق الزيارات الخارجية:</label>
+                                <input type="text" id="schedFridayTime" class="form-control" value="حسب مواعيد الزيارات المعلنة">
+                            </div>
+                            <div class="form-group col-half">
+                                <label>وصف مختصر للمجالس الخارجية:</label>
+                                <input type="text" id="schedFridayDesc" class="form-control" value="المجالس والدروس الخارجية والزيارات الدعوية لفضيلة الشيخ التي تُعقد في مختلف المحافظات والمراكز، بخلاف لقاء الأحد والسبت.">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fa-solid fa-floppy-disk"></i> حفظ مواعيد الساحة
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+        <!-- TAB 3: Quotes Management -->
+        <section class="admin-tab-content" id="tabQuotes">
+            <div class="admin-panel-card">
+                <div class="panel-header-controls">
+                    <div class="panel-title-bar">
+                        <h3><i class="fa-solid fa-feather-pointed gold-icon"></i> درر ومواعظ الشيخ المنشورة</h3>
+                        <p>يمكنك إضافة حكم ومواعظ جديدة أو حذف وتعديل المواعظ الحالية</p>
+                    </div>
+                    <button id="openAddQuoteBtn" class="btn btn-gold btn-sm" type="button" onclick="openAddQuoteModal()">
+                        <i class="fa-solid fa-plus"></i> إضافة موعظة جديدة
+                    </button>
+                </div>
+
+                <div class="quotes-admin-grid" id="adminQuotesList">
+                    <!-- Populated via admin.js -->
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 4: General Settings & Platforms -->
+        <section class="admin-tab-content" id="tabSettings">
+            <div class="admin-panel-card">
+                <div class="panel-title-bar">
+                    <h3><i class="fa-solid fa-sliders gold-icon"></i> إعدادات المنظومة وقناة اليوتيوب</h3>
+                    <p>تعديل معرف القناة للمزامنة التلقائية وروابط المنصات والشريط الإخباري</p>
+                </div>
+
+                <form id="settingsForm" class="admin-form" novalidate>
+                    <div class="form-group">
+                        <label><i class="fa-brands fa-youtube"></i> معرف القناة الرسمية للمزامنة (Channel ID):</label>
+                        <input type="text" id="cfgChannelId" class="form-control" value="UCB_Glq0cZ2TQtGiWfqUotJw" required>
+                        <small class="form-text-muted">هذا هو المعرف الرسمي لقناة "فضيلة الشيخ أحمد مرتضى" لجلب الفيديوهات تلقائياً عبر RSS.</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label><i class="fa-solid fa-bullhorn"></i> نص الشريط الإخباري العلوي:</label>
+                        <input type="text" id="cfgAnnouncement" class="form-control" value="﷽ • قُلْ هَٰذِهِ سَبِيلِي أَدْعُو إِلَى اللَّهِ عَلَىٰ بَصِيرَةٍ • ساحة الشيخ بالأقصر">
+                    </div>
+
+                    <div class="social-manager-box">
+                        <div class="social-manager-header">
+                            <div>
+                                <h4 class="form-subheading" style="margin: 0; padding: 0; border: none;">
+                                    <i class="fa-solid fa-share-nodes gold-icon"></i> إضافة وإدارة روابط منصات التواصل:
+                                </h4>
+                                <p class="form-text-muted" style="margin-top: 4px;">
+                                    اختر المنصة من القائمة المنسدلة وضع الرابط واضغط «إضافة المنصة» لتظهر فوراً في الشريط السفلي للمدونة، أو عدّل واحذف أي منصة موجودة مباشرة.
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- صندوق اختيار المنصة من قائمة منسدلة وإضافة الرابط -->
+                        <div class="add-social-link-card">
+                            <label class="add-link-label"><i class="fa-solid fa-list-check gold-icon"></i> اختر المنصة من القائمة المنسدلة وضع الرابط لإضافتها للمدونة:</label>
+                            <div class="add-social-inputs-row">
+                                <!-- القائمة المنسدلة لأسماء المنصات مع الأيقونات -->
+                                <div class="link-platform-select-field">
+                                    <div class="platform-select-wrap">
+                                        <span class="platform-select-badge" id="newSocialIconBadge">
+                                            <i class="fa-brands fa-youtube"></i>
+                                        </span>
+                                        <select id="newSocialPlatformSelect" class="form-control custom-select platform-dropdown" aria-label="اختر منصة التواصل الاجتماعي">
+                                            <option value="youtube" selected>🔴 يوتيوب (YouTube)</option>
+                                            <option value="facebook">🔵 فيسبوك (Facebook)</option>
+                                            <option value="whatsapp">🟢 واتساب (WhatsApp)</option>
+                                            <option value="telegram">✈️ تيليجرام (Telegram)</option>
+                                            <option value="instagram">📸 إنستغرام (Instagram)</option>
+                                            <option value="twitter">✖️ منصة X (تويتر)</option>
+                                            <option value="tiktok">🎵 تيك توك (TikTok)</option>
+                                            <option value="maps">📍 موقع الساحة (خرائط Google)</option>
+                                            <option value="soundcloud">🎧 ساوند كلاود (SoundCloud)</option>
+                                            <option value="threads">🧵 ثريدز (Threads)</option>
+                                            <option value="snapchat">👻 سناب شات (Snapchat)</option>
+                                            <option value="linkedin">💼 لينكد إن (LinkedIn)</option>
+                                            <option value="pinterest">📌 بينتريست (Pinterest)</option>
+                                            <option value="web">🌐 موقع رسمي / رابط مخصص</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <!-- حقل الرابط -->
+                                <div class="link-url-field">
+                                    <input type="text" id="newSocialUrlInput" class="form-control smart-social-input" placeholder="https://www.youtube.com/@..." autocomplete="off">
+                                </div>
+
+                                <!-- حقل اسم المنصة / المسمى -->
+                                <div class="link-title-field">
+                                    <input type="text" id="newSocialTitleInput" class="form-control" value="يوتيوب" placeholder="اسم المنصة" style="height: 48px;">
+                                </div>
+
+                                <!-- زر الإضافة -->
+                                <button type="button" id="addNewSocialLinkBtn" class="btn btn-gold" style="height: 48px; white-space: nowrap;">
+                                    <i class="fa-solid fa-plus"></i> إضافة المنصة
+                                </button>
+                            </div>
+                            <div class="link-detect-feedback" id="newSocialDetectFeedback">
+                                <span class="feedback-text"><i class="fa-solid fa-wand-magic-sparkles"></i> اختر اسم المنصة من القائمة وضع رابطها واضغط «إضافة المنصة» لتظهر فوراً في الشريط السفلي للمدونة!</span>
+                            </div>
+                        </div>
+
+                        <!-- قائمة الروابط المضافة للموقع -->
+                        <div class="active-links-section">
+                            <div class="active-links-header">
+                                <div>
+                                    <h5><i class="fa-solid fa-list-check gold-icon"></i> منصات التواصل المعتمدة في الموقع (<span id="activeSocialCount">0</span>):</h5>
+                                    <small class="form-text-muted">يمكنك تعديل أي رابط ومسماه مباشرة في حقله أو الضغط على «مسح» لحذف المنصة فوراً من المدونة:</small>
+                                </div>
+                                <button type="button" id="restoreDefaultSocialLinksBtn" class="btn btn-outline-gold btn-sm" title="استعادة روابط المنصات الرسمية الخمس لساحة الشيخ بالأقصر">
+                                    <i class="fa-solid fa-rotate-left"></i> استعادة المنصات الافتراضية
+                                </button>
+                            </div>
+                            <div id="activeSocialLinksList" class="active-social-links-grid">
+                                <!-- Populated dynamically via JS -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-actions" style="margin-top: 2rem;">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="fa-solid fa-floppy-disk"></i> حفظ كافة الإعدادات والروابط
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- بطاقة وسائط وصورة الهيرو المخصصة -->
+            <div class="admin-panel-card" style="margin-top: 2rem;">
+                <div class="panel-title-bar">
+                    <h3><i class="fa-solid fa-image gold-icon"></i> تخصيص الصورة المعتمدة ومكان آخر الفيديوهات المسجلة</h3>
+                    <p>إمكانية رفع صورة مخصصة من جهازك لتعرض بمقاساتها الكاملة وبدقة عالية مكان آخر الفيديوهات المسجلة في المدونة وفي الواجهة الرئيسية</p>
+                </div>
+
+                <div class="hero-media-settings-box">
+                    <div class="form-group">
+                        <label class="form-subheading" style="margin-bottom: 0.75rem;"><i class="fa-solid fa-sliders gold-icon"></i> خيار العرض في المدونة:</label>
+                        <div class="hero-media-mode-selector">
+                            <label class="media-mode-option" id="labelModeImage">
+                                <input type="radio" name="heroMediaMode" value="image" id="heroModeImage" checked>
+                                <span class="mode-box">
+                                    <i class="fa-solid fa-image"></i>
+                                    <strong>الصورة الرسمية المعتمدة لفضيلة الشيخ</strong>
+                                    <small>عرض الصورة الرسمية لفضيلة الشيخ مع إطار إسلامي ذهبي فخم وبمقاساتها الطبيعية دون أي اقتصاص</small>
+                                </span>
+                            </label>
+                            <label class="media-mode-option" id="labelModeVideo" style="display: none;">
+                                <input type="radio" name="heroMediaMode" value="video" id="heroModeVideo">
+                                <span class="mode-box">
+                                    <i class="fa-brands fa-youtube"></i>
+                                    <strong>عرض أحدث درس مسجل من يوتيوب</strong>
+                                    <small>عرض بطاقة أحدث فيديو مسجل من يوتيوب مع إمكانية التشغيل الفوري</small>
+                                </span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- قسم رفع الصورة المخصصة -->
+                    <div id="heroImageUploadSection" class="hero-image-upload-wrap" style="display: block; margin-top: 1.5rem;">
+                        <div class="upload-dropzone" id="heroImageDropzone">
+                            <i class="fa-solid fa-cloud-arrow-up upload-icon"></i>
+                            <h4>اسحب وأفلت صورة الهيرو هنا أو اضغط لتحديدها من جهازك</h4>
+                            <p class="form-text-muted">الامتدادات المدعومة: JPG, PNG, WEBP, GIF (الحد الأقصى: 8 ميجابايت)</p>
+                            <input type="file" id="heroImageFileInput" accept="image/png, image/jpeg, image/webp, image/gif" style="display: none;">
+                            <button type="button" class="btn btn-outline-gold" onclick="document.getElementById('heroImageFileInput').click()">
+                                <i class="fa-solid fa-folder-open"></i> اختيار ملف من الكمبيوتر
+                            </button>
+                        </div>
+
+                        <!-- معاينة الصورة المرفوعة -->
+                        <div id="heroImagePreviewBox" class="hero-preview-box" style="display: none; margin-top: 1.25rem;">
+                            <div class="preview-img-wrap">
+                                <img id="heroImagePreview" src="" alt="معاينة صورة الهيرو">
+                                <button type="button" id="removeHeroImageBtn" class="btn-remove-preview" title="إزالة هذه الصورة">
+                                    <i class="fa-solid fa-trash-can"></i>
+                                </button>
+                            </div>
+                            <div class="preview-meta-fields">
+                                <div class="form-group">
+                                    <label for="heroImageTitleInput"><i class="fa-solid fa-heading"></i> عنوان الصورة (يظهر بالمدونة):</label>
+                                    <input type="text" id="heroImageTitleInput" class="form-control" placeholder="مثال: ساحة فضيلة الشيخ بالأقصر - لقاء الأحد">
+                                </div>
+                                <div class="form-group">
+                                    <label for="heroImageSubtitleInput"><i class="fa-solid fa-align-right"></i> وصف مختصر أو تعليق:</label>
+                                    <input type="text" id="heroImageSubtitleInput" class="form-control" placeholder="مثال: صرح المحبة النبوية وتزكية النفوس">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-actions" style="margin-top: 1.5rem;">
+                        <button type="button" id="saveHeroMediaBtn" class="btn btn-primary">
+                            <i class="fa-solid fa-floppy-disk"></i> حفظ إعدادات وسائط الهيرو
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 5: Security & Credentials Management -->
+        <section class="admin-tab-content" id="tabSecurity">
+            <div class="admin-panel-card">
+                <div class="panel-title-bar">
+                    <h3><i class="fa-solid fa-shield-halved gold-icon"></i> أمان لوحة التحكم وتغيير بيانات الدخول</h3>
+                    <p>تغيير اسم المستخدم وكلمة المرور المشفرة للوصول إلى لوحة التحكم لحماية المنصة من أي اختراق</p>
+                </div>
+
+                <div class="security-info-alert">
+                    <i class="fa-solid fa-lock security-icon"></i>
+                    <div>
+                        <strong>نظام التشفير القياسي نشط ومحمٍّ بالكامل:</strong>
+                        <p>كلمة المرور تُخزن على الخادم بتشفير دالي معقد (PBKDF2 مع Salt عشوائي 100,000 دورة)، ولا يمكن لأي طرف استخراجها أو اختراقها. يمكنك تغيير اسم المستخدم وكلمة المرور في أي وقت.</p>
+                    </div>
+                </div>
+
+                <form id="changeCredentialsForm" class="admin-form" style="max-width: 650px; margin-top: 1.5rem;" autocomplete="off">
+                    <div class="form-group">
+                        <label for="curPassword"><i class="fa-solid fa-key"></i> كلمة المرور الحالية: <span class="required">*</span></label>
+                        <input type="password" id="curPassword" class="form-control" placeholder="أدخل كلمة المرور الحالية للتأكيد" required autocomplete="current-password">
+                        <small class="form-text-muted">إذا كانت هذه أول مرة، فكلمة المرور الافتراضية هي: <code>sheikh2026</code></small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="newUsername"><i class="fa-solid fa-user-shield"></i> اسم المستخدم الجديد: <span class="required">*</span></label>
+                        <input type="text" id="newUsername" class="form-control" placeholder="اسم المستخدم الجديد (3 أحرف على الأقل)" required autocomplete="username">
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group col-half">
+                            <label for="newPassword"><i class="fa-solid fa-lock"></i> كلمة المرور الجديدة: <span class="required">*</span></label>
+                            <input type="password" id="newPassword" class="form-control" placeholder="كلمة المرور الجديدة (6 أحرف على الأقل)" required autocomplete="new-password">
+                        </div>
+                        <div class="form-group col-half">
+                            <label for="confirmNewPassword"><i class="fa-solid fa-check-double"></i> تأكيد كلمة المرور الجديدة: <span class="required">*</span></label>
+                            <input type="password" id="confirmNewPassword" class="form-control" placeholder="أعد كتابة كلمة المرور الجديدة" required autocomplete="new-password">
+                        </div>
+                    </div>
+
+                    <div class="form-actions" style="margin-top: 2rem;">
+                        <button type="submit" class="btn btn-primary btn-lg" id="changeCredsSubmitBtn">
+                            <i class="fa-solid fa-shield-check"></i> تحديث وحفظ بيانات الدخول الجديدة
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+        <!-- Admin Login Gate / Lock Screen -->
+        <div id="adminLoginGate" class="admin-login-gate" style="display: none;">
+            <div class="login-gate-card">
+                <div class="login-gate-crest">
+                    <i class="fa-solid fa-kaaba"></i>
+                </div>
+                <h2 class="login-gate-title">تسجيل الدخول إلى لوحة التحكم</h2>
+                <p class="login-gate-subtitle">صرح ومدونة فضيلة الشيخ أحمد مرتضى حامد</p>
+                
+                <div id="loginGateAlert" class="login-gate-alert" style="display: none;"></div>
+
+                <form id="adminLoginForm" class="login-gate-form" autocomplete="on">
+                    <div class="form-group">
+                        <label for="loginGateUsername"><i class="fa-solid fa-user"></i> اسم المستخدم:</label>
+                        <input type="text" id="loginGateUsername" class="form-control" placeholder="اسم المستخدم" required autocomplete="username">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="loginGatePassword"><i class="fa-solid fa-lock"></i> كلمة المرور:</label>
+                        <input type="password" id="loginGatePassword" class="form-control" placeholder="كلمة المرور" required autocomplete="current-password">
+                    </div>
+
+                    <button type="submit" class="btn btn-gold btn-block btn-lg" id="loginGateSubmitBtn" style="margin-top: 1rem; width: 100%;">
+                        <i class="fa-solid fa-right-to-bracket"></i> دخول إلى لوحة التحكم
+                    </button>
+                </form>
+
+                <div class="login-gate-footer">
+                    <a href="index.html" class="back-to-blog-link"><i class="fa-solid fa-arrow-right"></i> الرجوع إلى واجهة المدونة</a>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Modal: Add / Edit Video -->
+    <div class="modal-backdrop" id="adminVideoModal" role="dialog" aria-modal="true" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div class="modal-title-wrap">
+                        <span class="modal-badge" id="adminModalModeBadge">إضافة درس جديد</span>
+                        <h3 class="modal-title" id="adminModalTitle">إضافة فيديو جديد للمكتبة</h3>
+                    </div>
+                    <button class="modal-close-btn" id="closeAdminModalBtn" aria-label="إغلاق" type="button" onclick="closeModal(document.getElementById('adminVideoModal'))">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+                <form id="adminVideoForm" class="modal-body">
+                    <input type="hidden" id="editVideoOriginalId">
+
+                    <div class="form-group">
+                        <label for="admVideoUrl"><i class="fa-brands fa-youtube"></i> رابط يوتيوب أو معرف الفيديو (11 حرف): <span class="required">*</span></label>
+                        <input type="text" id="admVideoUrl" class="form-control" placeholder="https://www.youtube.com/watch?v=... أو معرف الفيديو" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="admVideoTitle"><i class="fa-solid fa-heading"></i> عنوان الدرس والمحاضرة: <span class="required">*</span></label>
+                        <input type="text" id="admVideoTitle" class="form-control" placeholder="اكتب عنوان الدرس..." required>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group col-half">
+                            <label for="admVideoCategory"><i class="fa-solid fa-tags"></i> التصنيف: <span class="required">*</span></label>
+                            <select id="admVideoCategory" class="form-control custom-select" required>
+                                <option value="ساحة_الأقصر">لقاءات الساحة بالأقصر</option>
+                                <option value="السيرة_النبوية">السيرة والشمائل المحمدية</option>
+                                <option value="تزكية_النفوس">تزكية القلوب والأخلاق</option>
+                                <option value="علوم_القرآن">تدبر القرآن الكريم</option>
+                                <option value="مناسبات_وأمسيات">مناسبات وأمسيات دينية</option>
+                                <option value="رقائق_وقصائر">رقائق ومواعظ قصيرة</option>
+                            </select>
+                        </div>
+                        <div class="form-group col-half">
+                            <label for="admVideoDate"><i class="fa-solid fa-calendar"></i> تاريخ النشر: <span class="required">*</span></label>
+                            <input type="date" id="admVideoDate" class="form-control" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group col-half">
+                            <label for="admVideoDuration"><i class="fa-regular fa-clock"></i> المدة:</label>
+                            <input type="text" id="admVideoDuration" class="form-control" placeholder="مثال: 55:20">
+                        </div>
+                        <div class="form-group col-half">
+                            <label for="admVideoViews"><i class="fa-solid fa-eye"></i> عدد المشاهدات:</label>
+                            <input type="number" id="admVideoViews" class="form-control" placeholder="مثال: 35000">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="admVideoDesc"><i class="fa-solid fa-paragraph"></i> نبذة مختصرة عن الدرس:</label>
+                        <textarea id="admVideoDesc" class="form-control" rows="3" placeholder="ملخص عن محاور هذا اللقاء المبارك..."></textarea>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary btn-block" id="admSubmitBtn">
+                            <i class="fa-solid fa-floppy-disk"></i> حفظ الدرس
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Add Quote -->
+    <div class="modal-backdrop" id="adminQuoteModal" role="dialog" aria-modal="true" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div class="modal-title-wrap">
+                        <span class="modal-badge">درر ومواعظ</span>
+                        <h3 class="modal-title">إضافة موعظة جديدة لفضيلة الشيخ</h3>
+                    </div>
+                    <button class="modal-close-btn" id="closeQuoteModalBtn" aria-label="إغلاق" type="button" onclick="closeModal(document.getElementById('adminQuoteModal'))">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+                <form id="adminQuoteForm" class="modal-body">
+                    <div class="form-group">
+                        <label for="newQuoteCategory">الموضوع / التصنيف:</label>
+                        <input type="text" id="newQuoteCategory" class="form-control" placeholder="مثال: تزكية النفس، محبة النبي ﷺ، صلة الرحم..." required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="newQuoteText">نص الحكمة أو الموعظة المباركة:</label>
+                        <textarea id="newQuoteText" class="form-control" rows="4" placeholder="اكتب كلام فضيلة الشيخ هنا..." required></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="newQuoteSource">المصدر أو المجلس:</label>
+                        <input type="text" id="newQuoteSource" class="form-control" placeholder="مثال: من درس لقاء الأحد بساحة الأقصر" required>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary btn-block">
+                            <i class="fa-solid fa-floppy-disk"></i> نشر الحكمة
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification Container -->
+    <div class="toast-container" id="toastContainer" aria-live="polite"></div>
+
+    <!-- Scripts -->
+    <script src="admin.js?v=4.8"></script>
+</body>
+</html>
