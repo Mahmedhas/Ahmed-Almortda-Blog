@@ -1910,10 +1910,10 @@ function initTasbih() {
 
     // تحديث الواجهة الرسومية للمسبحة
     function updateTasbihUI() {
-        if (countDisplay) countDisplay.textContent = roundCount.toLocaleString('ar-EG');
+        if (countDisplay) countDisplay.textContent = Number(roundCount || 0).toLocaleString();
         if (sessionNumEl) sessionNumEl.textContent = `جلسة #${sessionNumber}`;
-        if (sessionCountEl) sessionCountEl.textContent = sessionCount.toLocaleString('ar-EG');
-        if (totalDisplay) totalDisplay.textContent = totalAll.toLocaleString('ar-EG');
+        if (sessionCountEl) sessionCountEl.textContent = Number(sessionCount || 0).toLocaleString();
+        if (totalDisplay) totalDisplay.textContent = Number(totalAll || 0).toLocaleString();
         if (sessionTimerEl) sessionTimerEl.textContent = formatTimer(sessionSeconds);
 
         // حساب وتحديث حلقة التقدم الدائرية
@@ -2231,7 +2231,7 @@ function initTasbih() {
                         </div>
                     </div>
                     <div class="history-item-count">
-                        ${item.count.toLocaleString('ar-EG')} <small style="font-weight: 500; font-size: 0.75rem;">تسبيحة</small>
+                        ${Number(item.count || 0).toLocaleString()} <small style="font-weight: 500; font-size: 0.75rem;">تسبيحة</small>
                     </div>
                 </div>
             `;

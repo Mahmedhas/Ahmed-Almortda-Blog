@@ -2607,22 +2607,41 @@ button, input, select, textarea {
     background: var(--bg-alt);
     border: 1px solid var(--border-subtle);
     border-radius: var(--radius-md);
-    padding: 0.75rem 0.65rem;
+    padding: 0.75rem 0.75rem;
     display: flex;
     align-items: center;
-    gap: 0.65rem;
+    gap: 0.75rem;
     transition: all var(--transition-fast);
 }
 
 .session-stat-pill:hover {
     border-color: var(--gold);
     transform: translateY(-2px);
+    box-shadow: 0 4px 14px rgba(13, 56, 47, 0.06);
 }
 
 .session-stat-pill i {
-    font-size: 1.25rem;
-    color: var(--gold);
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    background: rgba(197, 155, 39, 0.12);
+    color: var(--gold-dark);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.15rem;
     flex-shrink: 0;
+    transition: all var(--transition-fast);
+}
+
+[data-theme="dark"] .session-stat-pill i {
+    background: rgba(197, 155, 39, 0.18);
+    color: var(--gold);
+}
+
+.session-stat-pill:hover i {
+    background: var(--gold);
+    color: #ffffff;
 }
 
 .stat-text-group {
@@ -2630,6 +2649,9 @@ button, input, select, textarea {
     flex-direction: column;
     overflow: hidden;
     text-align: right;
+    min-width: 0;
+    gap: 0.15rem;
+    flex: 1;
 }
 
 .stat-label {
@@ -2645,6 +2667,9 @@ button, input, select, textarea {
     font-weight: 800;
     color: var(--text-primary);
     line-height: 1.2;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 /* Target & Controls Row */
@@ -4697,17 +4722,25 @@ img, iframe, video {
     }
 
     .tasbih-session-bar {
-        grid-template-columns: 1fr 1fr;
-        gap: 0.5rem;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.55rem;
     }
 
     .session-stat-pill {
-        padding: 0.55rem 0.5rem;
-        gap: 0.45rem;
+        padding: 0.6rem 0.55rem;
+        gap: 0.5rem;
+        border-radius: 12px;
     }
 
     .session-stat-pill i {
-        font-size: 1.05rem;
+        width: 34px;
+        height: 34px;
+        font-size: 1rem;
+        border-radius: 9px;
+    }
+
+    .stat-label {
+        font-size: 0.67rem;
     }
 
     .session-stat-pill strong {
@@ -5039,7 +5072,29 @@ img, iframe, video {
     }
 
     .tasbih-session-bar {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.45rem;
+    }
+
+    .session-stat-pill {
+        padding: 0.5rem 0.45rem;
+        gap: 0.4rem;
+        border-radius: 10px;
+    }
+
+    .session-stat-pill i {
+        width: 28px;
+        height: 28px;
+        font-size: 0.88rem;
+        border-radius: 7px;
+    }
+
+    .stat-label {
+        font-size: 0.62rem;
+    }
+
+    .session-stat-pill strong {
+        font-size: 0.88rem;
     }
 
     .tasbih-circle-outer {
