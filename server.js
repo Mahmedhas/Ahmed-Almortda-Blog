@@ -49,6 +49,38 @@ function writeJSON(filePath, data) {
     }
 }
 
+// دالة مزامنة صورة الهيرو مباشرة في ملف index.html لمنع أي وميض للصورة القديمة
+function syncHeroImageInIndexHtml(settings) {
+    try {
+        const indexPath = path.join(__dirname, 'index.html');
+        if (!fs.existsSync(indexPath)) return;
+        const heroImg = (settings && settings.heroMedia && (settings.heroMedia.customImageUrl || settings.heroMedia.imageUrl)) || '';
+        if (!heroImg) return;
+
+        let html = fs.readFileSync(indexPath, 'utf-8');
+
+        // تحديث src في وسم heroCustomImage
+        const imgRegex = /(<img\s+[^>]*id=["']heroCustomImage["'][^>]*src=["'])([^"']+)(["'][^>]*>)/i;
+        if (imgRegex.test(html)) {
+            html = html.replace(imgRegex, `$1${heroImg}$3`);
+        } else {
+            const imgRegexAlt = /(<img\s+[^>]*src=["'])([^"']+)(["'][^>]*id=["']heroCustomImage["'][^>]*>)/i;
+            if (imgRegexAlt.test(html)) {
+                html = html.replace(imgRegexAlt, `$1${heroImg}$3`);
+            }
+        }
+
+        // تحديث وسوم المشاركة og:image و twitter:image و schema.org
+        html = html.replace(/(<meta\s+property=["']og:image["']\s+content=["'])([^"']+)(["']>)/i, `$1${heroImg}$3`);
+        html = html.replace(/(<meta\s+name=["']twitter:image["']\s+content=["'])([^"']+)(["']>)/i, `$1${heroImg}$3`);
+
+        fs.writeFileSync(indexPath, html, 'utf-8');
+        console.log(`[HeroSync] تم تحديث صورة الهيرو في index.html بنجاح: ${heroImg}`);
+    } catch (err) {
+        console.error('[HeroSync] خطأ أثناء مزامنة index.html:', err.message);
+    }
+}
+
 // ==========================================================================
 // 1. نظام التشفير وإدارة الأمان (Cryptography & Auth Engine)
 // ==========================================================================
@@ -721,6 +753,7 @@ const server = http.createServer((req, res) => {
                     const current = readJSON(SETTINGS_FILE, {});
                     const merged = { ...current, ...newSettings };
                     writeJSON(SETTINGS_FILE, merged);
+                    syncHeroImageInIndexHtml(merged);
                     sendJSON(res, 200, { success: true, message: 'تم حفظ الإعدادات بنجاح', settings: merged });
                 } catch (e) {
                     sendJSON(res, 400, { success: false, message: 'بيانات غير صالحة' });
@@ -818,6 +851,47 @@ const server = http.createServer((req, res) => {
 
         setSecurityHeaders(res);
 
+        // المعالجة الفورية لصفحة index.html لضمان إرسال صورة الهيرو الحالية دائماً بدون وميض
+        if (filePath.endsWith('index.html')) {
+            try {
+                let html = fs.readFileSync(filePath, 'utf-8');
+                const settings = readJSON(SETTINGS_FILE, {});
+                const heroImg = (settings && settings.heroMedia && (settings.heroMedia.customImageUrl || settings.heroMedia.imageUrl)) || '';
+                if (heroImg) {
+                    const imgRegex = /(<img\s+[^>]*id=["']heroCustomImage["'][^>]*src=["'])([^"']+)(["'][^>]*>)/i;
+                    if (imgRegex.test(html)) {
+                        html = html.replace(imgRegex, `$1${heroImg}$3`);
+                    } else {
+                        const imgRegexAlt = /(<img\s+[^>]*src=["'])([^"']+)(["'][^>]*id=["']heroCustomImage["'][^>]*>)/i;
+                        if (imgRegexAlt.test(html)) {
+                            html = html.replace(imgRegexAlt, `$1${heroImg}$3`);
+                        }
+                    }
+                    html = html.replace(/(<meta\s+property=["']og:image["']\s+content=["'])([^"']+)(["']>)/i, `$1${heroImg}$3`);
+                    html = html.replace(/(<meta\s+name=["']twitter:image["']\s+content=["'])([^"']+)(["']>)/i, `$1${heroImg}$3`);
+                }
+
+                const acceptEncoding = req.headers['accept-encoding'] || '';
+                if (acceptEncoding.includes('gzip')) {
+                    headers['Content-Encoding'] = 'gzip';
+                    res.writeHead(200, headers);
+                    zlib.gzip(Buffer.from(html, 'utf-8'), (gzErr, buf) => {
+                        if (gzErr) {
+                            res.end(html);
+                        } else {
+                            res.end(buf);
+                        }
+                    });
+                } else {
+                    res.writeHead(200, headers);
+                    res.end(html);
+                }
+                return;
+            } catch (htmlErr) {
+                console.error('[Server] خطأ أثناء تقديم index.html:', htmlErr.message);
+            }
+        }
+
         // ضغط المحتوى الثابت تلقائياً لتحسين سرعة وأداء الموقع (Gzip Compression)
         const acceptEncoding = req.headers['accept-encoding'] || '';
         const canGzip = acceptEncoding.includes('gzip') && 
@@ -878,6 +952,9 @@ server.on('error', (err) => {
 });
 
 server.listen(PORT, () => {
+    try {
+        syncHeroImageInIndexHtml(readJSON(SETTINGS_FILE, {}));
+    } catch (e) {}
     console.log(`=======================================================`);
     console.log(`🕋 خادم مدونة فضيلة الشيخ أحمد مرتضى حامد يعمل الآن!`);
     console.log(`🛡️  نظام الحماية والمصادقة والتشفير: نشط بنجاح`);

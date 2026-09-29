@@ -1061,6 +1061,7 @@ function initAuthAndSecurity() {
 // إدارة وسائط الهيرو ورفع الصور المخصصة (Hero Media Manager)
 // ==========================================================================
 let currentHeroImageDataUrl = null;
+let isHeroImageDeleted = false;
 
 function initHeroMediaManager() {
     const radioVideo = document.getElementById('heroModeVideo');
@@ -1113,11 +1114,12 @@ function initHeroMediaManager() {
     if (removeBtn) {
         removeBtn.addEventListener('click', () => {
             currentHeroImageDataUrl = null;
+            isHeroImageDeleted = true;
             if (fileInput) fileInput.value = '';
             if (previewImg) previewImg.src = '';
             if (previewBox) previewBox.style.display = 'none';
             if (dropzone) dropzone.style.display = 'block';
-            showToast('تمت إزالة الصورة المحددة', 'info');
+            showToast('تمت إزالة الصورة المحددة بنجاح. اضغط حفظ لتطبيق التغيير.', 'info');
         });
     }
 
@@ -1139,6 +1141,7 @@ function handleSelectedHeroFile(file) {
     const reader = new FileReader();
     reader.onload = (e) => {
         currentHeroImageDataUrl = e.target.result;
+        isHeroImageDeleted = false;
         const previewImg = document.getElementById('heroImagePreview');
         const previewBox = document.getElementById('heroImagePreviewBox');
         const dropzone = document.getElementById('heroImageDropzone');
@@ -1163,7 +1166,12 @@ async function saveHeroMediaSettings() {
         currentSettings = JSON.parse(localStorage.getItem('sheikh_settings') || '{}');
     } catch(e) {}
 
-    let customImageUrl = (currentSettings.heroMedia && (currentSettings.heroMedia.customImageUrl || currentSettings.heroMedia.imageUrl)) || 'uploads/hero_1789291588780_01d38d97.png';
+    let customImageUrl = '';
+    if (isHeroImageDeleted) {
+        customImageUrl = '';
+    } else if (currentSettings.heroMedia && (currentSettings.heroMedia.customImageUrl || currentSettings.heroMedia.imageUrl)) {
+        customImageUrl = currentSettings.heroMedia.customImageUrl || currentSettings.heroMedia.imageUrl;
+    }
 
     if (saveBtn) {
         saveBtn.disabled = true;
@@ -1184,6 +1192,7 @@ async function saveHeroMediaSettings() {
             const upData = await upRes.json();
             if (upData.success && upData.url) {
                 customImageUrl = upData.url;
+                isHeroImageDeleted = false;
             } else {
                 showToast(`فشل رفع الصورة: ${upData.message || 'خطأ غير معروف'}`, 'error');
                 return;
@@ -2018,7 +2027,12 @@ async function handleSettingsSubmit() {
     const heroSubtitleInput = document.getElementById('heroImageSubtitleInput');
 
     let existingHeroMedia = currentStored.heroMedia || {};
-    let customImg = existingHeroMedia.customImageUrl || existingHeroMedia.imageUrl || 'uploads/hero_1789291588780_01d38d97.png';
+    let customImg = '';
+    if (isHeroImageDeleted) {
+        customImg = '';
+    } else if (existingHeroMedia.customImageUrl || existingHeroMedia.imageUrl) {
+        customImg = existingHeroMedia.customImageUrl || existingHeroMedia.imageUrl;
+    }
 
     if (isImageMode && currentHeroImageDataUrl && currentHeroImageDataUrl.startsWith('data:image/')) {
         try {
@@ -2033,6 +2047,7 @@ async function handleSettingsSubmit() {
             const upData = await upRes.json();
             if (upData.success && upData.url) {
                 customImg = upData.url;
+                isHeroImageDeleted = false;
             }
         } catch (e) {}
     }

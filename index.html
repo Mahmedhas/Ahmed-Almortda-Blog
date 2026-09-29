@@ -24,14 +24,14 @@
     <meta property="og:site_name" content="مدونة فضيلة الشيخ أحمد مرتضى حامد الرسمية">
     <meta property="og:title" content="مدونة فضيلة الشيخ أحمد مرتضى حامد | الموقع والمكتبة المرئية الرسمية">
     <meta property="og:description" content="المدونة الرسمية لفضيلة الشيخ أحمد مرتضى حامد - دروس ومحاضرات ساحة الشيخ بالأقصر، السيرة النبوية، وتزكية النفس وعلوم القرآن مرتبة ومصنفة.">
-    <meta property="og:image" content="uploads/hero_1789291588780_01d38d97.png">
+    <meta property="og:image" content="uploads/hero_1790644266215_39536263.jpg">
     <meta property="og:image:alt" content="فضيلة الشيخ أحمد مرتضى حامد">
 
     <!-- Twitter Cards -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="مدونة فضيلة الشيخ أحمد مرتضى حامد | الموقع والمكتبة المرئية الرسمية">
     <meta name="twitter:description" content="المدونة الرسمية لفضيلة الشيخ أحمد مرتضى حامد - دروس ومحاضرات ساحة الشيخ بالأقصر وتزكية النفس.">
-    <meta name="twitter:image" content="uploads/hero_1789291588780_01d38d97.png">
+    <meta name="twitter:image" content="uploads/hero_1790644266215_39536263.jpg">
 
     <!-- Schema.org JSON-LD Structured Data -->
     <script type="application/ld+json">
@@ -44,7 +44,7 @@
           "name": "الشيخ أحمد مرتضى حامد",
           "jobTitle": "عالم وداعية إسلامي",
           "description": "عالم وداعية إسلامي وخطيب بساحة العلم بالأقصر - صعيد مصر، متحدث في علوم التزكية والسيرة النبوية والعقيدة.",
-          "image": "uploads/hero_1789291588780_01d38d97.png",
+          "image": "uploads/hero_1790644266215_39536263.jpg",
           "address": {
             "@type": "PostalAddress",
             "addressLocality": "الأقصر",
@@ -163,7 +163,19 @@
                         <!-- Official Hero Image Showcase -->
                         <div class="featured-image-preview" id="heroFeaturedImageCard" role="region" title="الصورة الرسمية لفضيلة الشيخ">
                             <div class="featured-image-wrap">
-                                <img id="heroCustomImage" src="uploads/hero_1789291588780_01d38d97.png" alt="فضيلة الشيخ أحمد مرتضى حامد" class="featured-custom-img" width="960" height="1639" loading="eager" fetchpriority="high">
+                                <img id="heroCustomImage" src="uploads/hero_1790644266215_39536263.jpg" alt="فضيلة الشيخ أحمد مرتضى حامد" class="featured-custom-img" width="960" height="1639" loading="eager" fetchpriority="high">
+                                <script>
+                                    (function() {
+                                        try {
+                                            var s = JSON.parse(localStorage.getItem('sheikh_settings') || '{}');
+                                            var u = s && s.heroMedia && (s.heroMedia.customImageUrl || s.heroMedia.imageUrl);
+                                            if (u) {
+                                                var el = document.getElementById('heroCustomImage');
+                                                if (el && el.getAttribute('src') !== u) el.src = u;
+                                            }
+                                        } catch(e) {}
+                                    })();
+                                </script>
                             </div>
                             <div class="featured-info-box custom-image-info" style="display: none;">
                                 <div class="featured-tag"><i class="fa-solid fa-sparkles gold-icon"></i> الصرح الدعوي المبارك</div>

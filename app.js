@@ -772,14 +772,16 @@ function applyServerSettings(settings) {
 
     // 3. تحديث صورة الهيرو الرسمية لفضيلة الشيخ
     const heroMedia = settings.heroMedia || {};
-    const imgUrl = heroMedia.customImageUrl || heroMedia.imageUrl || 'uploads/hero_1789291588780_01d38d97.png';
+    const imgUrl = heroMedia.customImageUrl || heroMedia.imageUrl || 'uploads/hero_1790644266215_39536263.jpg';
 
     const customImg = document.getElementById('heroCustomImage');
     const customTitle = document.getElementById('heroCustomTitle');
     const customDesc = document.getElementById('heroCustomDesc');
 
     if (customImg && imgUrl) {
-        customImg.src = imgUrl;
+        if (customImg.getAttribute('src') !== imgUrl) {
+            customImg.src = imgUrl;
+        }
         customImg.alt = heroMedia.title || heroMedia.imageTitle || 'فضيلة الشيخ أحمد مرتضى حامد';
     }
     if (customTitle) {
