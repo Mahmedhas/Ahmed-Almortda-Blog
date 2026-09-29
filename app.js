@@ -3528,7 +3528,7 @@ const HIFZ_QUIZ_BANK = [
  */
 function initMaqraahEngine() {
     const maqraahSection = document.getElementById('maqraahSection');
-    if (!maqraahSection) return;
+    if (!maqraahSection || !document.getElementById('quranVersesContainer')) return; // المقرأة أصبحت في صفحة مستقلة maqraah.html
 
     // --- حالة مشغل القرآن ---
     const quranState = {
