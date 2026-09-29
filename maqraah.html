@@ -125,9 +125,26 @@
 
             <!-- التبويب الأول: المصحف المعلم المرتل التفاعلي -->
             <div class="maqraah-tab-pane active" id="maqraahTabReader" role="tabpanel">
-                <div class="maqraah-card">
+                <div class="maqraah-card" id="mushafCard">
 
-                    <!-- شريط البحث اللحظي عن السور بالكتابة -->
+                    <!-- شريط فاصلة القراءة المحفوظة (Bookmark Bar) -->
+                    <div class="quran-bookmark-banner" id="quranBookmarkBanner" style="display: none;">
+                        <div class="bookmark-banner-content">
+                            <i class="fa-solid fa-bookmark gold-icon"></i>
+                            <span class="bookmark-text" id="quranBookmarkText">آخر موضع قراءة محفوظ: سورة الفاتحة • الآية ١</span>
+                        </div>
+                        <div class="bookmark-banner-actions">
+                            <button type="button" class="btn btn-gold btn-xs" id="resumeBookmarkBtn" title="الانتقال الفوري لموضع الفاصلة">
+                                <i class="fa-solid fa-arrow-turn-down"></i>
+                                <span>متابعة القراءة</span>
+                            </button>
+                            <button type="button" class="btn-icon-xs" id="removeBookmarkBtn" title="حذف الفاصلة">
+                                <i class="fa-solid fa-xmark"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- شريط البحث اللحظي عن السور وزر الفهرس الشامل -->
                     <div class="surah-search-wrapper">
                         <div class="surah-search-input-wrap">
                             <i class="fa-solid fa-magnifying-glass search-icon"></i>
@@ -136,6 +153,10 @@
                                 <i class="fa-solid fa-xmark"></i>
                             </button>
                         </div>
+                        <button type="button" class="btn btn-outline-gold btn-sm quran-index-open-btn" id="openQuranIndexBtn" title="فتح الفهرس الشامل للسور والأجزاء الثلاثين">
+                            <i class="fa-solid fa-book-atlas"></i>
+                            <span>فهرس السور والأجزاء</span>
+                        </button>
                         <div id="surahSearchDropdown" class="surah-search-dropdown" role="listbox">
                             <!-- Populated dynamically via JS -->
                         </div>
@@ -152,14 +173,19 @@
                                 </select>
                             </div>
 
-                            <!-- اختيار القارئ المعلم -->
+                            <!-- اختيار القارئ المعلم (نخبة كبار القراء المعتمدين) -->
                             <div class="quran-select-group reciter-group">
                                 <label for="quranReciterSelect"><i class="fa-solid fa-microphone-lines gold-icon"></i> القارئ المعلم:</label>
                                 <select id="quranReciterSelect" class="custom-select quran-select">
                                     <option value="ar.husary">محمود خليل الحصري (المصحف المعلم - الترتيل)</option>
                                     <option value="ar.minshawi">محمد صديق المنشاوي (المصحف المرتل)</option>
                                     <option value="ar.abdulbasitmurattal">عبد الباسط عبد الصمد (مرتل)</option>
-                                    <option value="ar.alafasy">مشاري راشد العفاسي</option>
+                                    <option value="ar.hudhaify">علي بن عبد الرحمن الحذيفي (مرتل متقن)</option>
+                                    <option value="ar.mahermuaiqly">ماهر المعيقلي (المسجد الحرام)</option>
+                                    <option value="ar.alafasy">مشاري بن راشد العفاسي</option>
+                                    <option value="ar.saadalghamdi">سعد الغامدي</option>
+                                    <option value="ar.abdullahbasfar">عبد الله بصفر (مرتل تعليمي)</option>
+                                    <option value="ar.shaatree">أبو بكر الشاطري</option>
                                 </select>
                             </div>
 
@@ -175,12 +201,23 @@
                             </div>
                         </div>
 
-                        <!-- أدوات التحكم الإضافية ووضع التسميع -->
+                        <!-- أدوات التحكم الإضافية، وضع التسميع، مظهر ورق المصحف، وحجم الخط -->
                         <div class="quran-toolbar-row secondary-controls">
                             <button type="button" class="tool-toggle-btn blind-recite-btn" id="blindReciteToggle" title="إخفاء كلمات الآيات للتسميع غيباً، وبالنقر على أي آية تظهر للتأكد من حفظك" aria-pressed="false">
                                 <i class="fa-solid fa-eye-slash"></i>
                                 <span>وضع التسميع الذاتي (إخفاء/كشف الآيات)</span>
                             </button>
+
+                            <!-- مظهر ورق المصحف الشريف -->
+                            <div class="mushaf-theme-selector" role="radiogroup" aria-label="مظهر ورق المصحف">
+                                <span class="theme-picker-label"><i class="fa-solid fa-palette gold-icon"></i> ورق المصحف:</span>
+                                <div class="mushaf-theme-pills">
+                                    <button type="button" class="theme-pill-btn active" data-mushaf-theme="cream" title="ورق مصحف المدينة الكريمي التراثي المريح للعين">كريمي</button>
+                                    <button type="button" class="theme-pill-btn" data-mushaf-theme="white" title="أبيض ناصع">أبيض</button>
+                                    <button type="button" class="theme-pill-btn" data-mushaf-theme="emerald" title="زمردي نبوي">زمردي</button>
+                                    <button type="button" class="theme-pill-btn" data-mushaf-theme="dark" title="ليلي فاخر">ليلي</button>
+                                </div>
+                            </div>
 
                             <div class="quran-action-buttons">
                                 <button type="button" class="btn btn-primary btn-sm" id="quranPlaySurahBtn">
@@ -313,6 +350,15 @@
                                 <span class="audio-repeat-badge" id="audioRepeatBadge" style="display: none;">تكرار: 1/3</span>
                             </div>
                             <div class="audio-playback-controls">
+                                <!-- سرعة التلاوة -->
+                                <div class="audio-speed-control" title="سرعة التلاوة">
+                                    <select id="audioSpeedSelect" class="audio-speed-select">
+                                        <option value="0.75">0.75x</option>
+                                        <option value="1.0" selected>1.0x</option>
+                                        <option value="1.25">1.25x</option>
+                                        <option value="1.5">1.5x</option>
+                                    </select>
+                                </div>
                                 <button type="button" class="audio-ctrl-btn" id="audioPrevAyahBtn" title="الآية السابقة">
                                     <i class="fa-solid fa-forward-step"></i>
                                 </button>
@@ -380,8 +426,16 @@
                     <div class="quiz-active-screen" id="quizActiveScreen" style="display: none;">
                         <div class="quiz-progress-header">
                             <div class="quiz-step-info">
-                                <span class="quiz-step-text" id="quizStepText">السؤال ١ من ٥</span>
-                                <span class="quiz-score-badge" id="quizLiveScore">النقاط: ٠</span>
+                                <div class="quiz-step-left-meta">
+                                    <span class="quiz-step-text" id="quizStepText">السؤال ١ من ٥</span>
+                                    <span class="quiz-score-badge" id="quizLiveScore">النقاط: ٠</span>
+                                </div>
+                                <div class="quiz-header-actions">
+                                    <button type="button" class="btn btn-outline-danger btn-xs quiz-cancel-btn" id="quizCancelBtn" title="إلغاء هذا الاختبار والعودة لشاشة الاختيار">
+                                        <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                                        <span>إلغاء الاختبار</span>
+                                    </button>
+                                </div>
                             </div>
                             <div class="quiz-progress-track">
                                 <div class="quiz-progress-fill" id="quizProgressBarFill" style="width: 20%;"></div>
@@ -419,7 +473,7 @@
                         </div>
                     </div>
 
-                    <!-- شاشة النتيجة والتكريم -->
+                    <!-- شاشة النتيجة والتكريم والمراجعة التفصيلية -->
                     <div class="quiz-result-screen" id="quizResultScreen" style="display: none;">
                         <div class="result-celebration-wrap text-center">
                             <div class="result-badge-icon" id="resultBadgeIcon">
@@ -438,6 +492,10 @@
                                     <i class="fa-solid fa-rotate-right"></i>
                                     <span>إجراء اختبار جديد</span>
                                 </button>
+                                <button type="button" class="btn btn-outline" id="toggleQuizReviewBtn">
+                                    <i class="fa-solid fa-list-check"></i>
+                                    <span>مراجعة الأسئلة وتفسيرها</span>
+                                </button>
                                 <button type="button" class="btn btn-outline-gold" id="shareQuizResultBtn">
                                     <i class="fa-solid fa-share-nodes"></i>
                                     <span>مشاركة النتيجة</span>
@@ -446,6 +504,17 @@
                                     <i class="fa-solid fa-book-open"></i>
                                     <span>العودة للمصحف المعلم</span>
                                 </button>
+                            </div>
+
+                            <!-- قسم مراجعة إجابات الاختبار -->
+                            <div class="quiz-review-section" id="quizReviewSection" style="display: none;">
+                                <div class="review-header">
+                                    <h4><i class="fa-solid fa-clipboard-check gold-icon"></i> مراجعة تفاصيل أسئلة الاختبار وتفسيرها</h4>
+                                    <p>طالع أسئلة الاختبار وإجاباتك مع التفسير لترسيخ حفظك وتجنب الأخطاء لاحقاً:</p>
+                                </div>
+                                <div class="quiz-review-list" id="quizReviewList">
+                                    <!-- Populated dynamically -->
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -558,6 +627,133 @@
             </div>
         </div>
     </footer>
+
+    <!-- ==========================================================================
+         النوافذ المنبثقة التفاعلية (Modals)
+         ========================================================================== -->
+
+    <!-- ١. نافذة التفسير الميسر المعتمد للآية الكريمة -->
+    <div class="quran-modal-overlay" id="tafsirModal" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="tafsirModalTitle">
+        <div class="quran-modal-box">
+            <div class="quran-modal-header">
+                <div class="modal-title-wrap">
+                    <i class="fa-solid fa-book-open-reader gold-icon"></i>
+                    <h3 id="tafsirModalTitle">التفسير الميسر • سورة الفاتحة</h3>
+                </div>
+                <button type="button" class="quran-modal-close-btn" id="closeTafsirModalBtn" title="إغلاق نافذة التفسير">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div class="quran-modal-body">
+                <div class="tafsir-ayah-box">
+                    <span class="tafsir-ayah-badge" id="tafsirAyahBadge">الآية ١</span>
+                    <div class="tafsir-ayah-text" id="tafsirAyahText">بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ</div>
+                </div>
+                <div class="tafsir-content-wrap">
+                    <h4 class="tafsir-source-title"><i class="fa-solid fa-feather gold-icon"></i> التفسير الميسر (مجمع الملك فهد):</h4>
+                    <div class="tafsir-body-text" id="tafsirBodyText">
+                        <div class="tafsir-loading"><i class="fa-solid fa-circle-notch fa-spin gold-icon"></i> جاري جلب التفسير الميسر المبارك...</div>
+                    </div>
+                </div>
+            </div>
+            <div class="quran-modal-footer">
+                <button type="button" class="btn btn-primary btn-sm" id="tafsirPlayAyahBtn">
+                    <i class="fa-solid fa-volume-high"></i>
+                    <span>استماع للآية</span>
+                </button>
+                <button type="button" class="btn btn-outline-gold btn-sm" id="tafsirCopyBtn">
+                    <i class="fa-solid fa-copy"></i>
+                    <span>نسخ الآية والتفسير</span>
+                </button>
+                <button type="button" class="btn btn-outline btn-sm" id="tafsirSetBookmarkBtn">
+                    <i class="fa-solid fa-bookmark"></i>
+                    <span>حفظ كفاصلة</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ٢. نافذة التأكيد الذكي لإلغاء الاختبار -->
+    <div class="quran-modal-overlay" id="quizCancelModal" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="quizCancelModalTitle">
+        <div class="quran-modal-box cancel-modal-box">
+            <div class="quran-modal-header cancel-header">
+                <div class="modal-title-wrap">
+                    <i class="fa-solid fa-triangle-exclamation danger-icon"></i>
+                    <h3 id="quizCancelModalTitle">إلغاء اختبار الحفظ</h3>
+                </div>
+                <button type="button" class="quran-modal-close-btn" id="closeQuizCancelModalBtn" title="إغلاق">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div class="quran-modal-body text-center">
+                <p class="cancel-notice-text">
+                    هل أنت متأكد من رغبتك في إلغاء هذا الاختبار؟ يمكنك العودة لاختيار نطاق آخر أو إنهاء الاختبار فوراً واحتساب ما تم إنجازه.
+                </p>
+                <div class="cancel-actions-column">
+                    <button type="button" class="btn btn-outline-gold btn-block" id="finishAndShowScoreBtn">
+                        <i class="fa-solid fa-square-poll-vertical"></i>
+                        <span>إنهاء وعرض النتيجة الحالية</span>
+                    </button>
+                    <button type="button" class="btn btn-danger btn-block" id="confirmCancelQuizBtn">
+                        <i class="fa-solid fa-trash-can"></i>
+                        <span>نعم، إلغاء الاختبار والعودة للبداية</span>
+                    </button>
+                    <button type="button" class="btn btn-outline btn-block" id="continueQuizBtn">
+                        <i class="fa-solid fa-arrow-rotate-left"></i>
+                        <span>متابعة الاختبار دون إلغاء</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ٣. نافذة الفهرس الشامل للسور والأجزاء الثلاثين -->
+    <div class="quran-modal-overlay" id="quranIndexModal" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="quranIndexModalTitle">
+        <div class="quran-modal-box index-modal-box">
+            <div class="quran-modal-header">
+                <div class="modal-title-wrap">
+                    <i class="fa-solid fa-book-atlas gold-icon"></i>
+                    <h3 id="quranIndexModalTitle">فهرس المصحف الشريف والأجزاء</h3>
+                </div>
+                <button type="button" class="quran-modal-close-btn" id="closeQuranIndexModalBtn" title="إغلاق الفهرس">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div class="quran-modal-body index-modal-body">
+                <!-- أشرطة تبويب الفهرس: السور / الأجزاء -->
+                <div class="index-nav-tabs">
+                    <button type="button" class="index-tab-btn active" data-index-tab="surahs" id="indexTabSurahsBtn">
+                        <i class="fa-solid fa-book-quran"></i>
+                        <span>فهرس السور (١١٤ سورة)</span>
+                    </button>
+                    <button type="button" class="index-tab-btn" data-index-tab="juzs" id="indexTabJuzsBtn">
+                        <i class="fa-solid fa-layer-group"></i>
+                        <span>فهرس الأجزاء (٣٠ جزءاً)</span>
+                    </button>
+                </div>
+
+                <!-- شريط تصفية سريع للسور في الفهرس -->
+                <div class="index-search-wrap" id="indexSearchWrap">
+                    <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                    <input type="search" id="indexModalSearchInput" class="index-search-input" placeholder="ابحث باسم السورة أو رقمها في الفهرس..." autocomplete="off" />
+                </div>
+
+                <!-- محتوى تبويب السور -->
+                <div class="index-tab-content active" id="indexSurahsContent">
+                    <div class="surahs-index-grid" id="surahsIndexGrid">
+                        <!-- Populated dynamically via JS -->
+                    </div>
+                </div>
+
+                <!-- محتوى تبويب الأجزاء الثلاثين -->
+                <div class="index-tab-content" id="indexJuzsContent" style="display: none;">
+                    <div class="juzs-index-grid" id="juzsIndexGrid">
+                        <!-- Populated dynamically via JS -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- زر الصعود لأعلى الصفحة -->
     <button id="backToTopBtn" class="back-to-top" title="العودة لأعلى الصفحة" aria-label="العودة لأعلى الصفحة">
