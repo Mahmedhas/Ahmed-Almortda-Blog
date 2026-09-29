@@ -476,8 +476,8 @@ button, input, select, textarea {
 
 .hero-container {
     display: grid;
-    grid-template-columns: 1.15fr 0.85fr;
-    gap: 3rem;
+    grid-template-columns: 1fr 1fr;
+    gap: 2.5rem;
     align-items: center;
     max-width: var(--container-width, 1200px);
     margin: 0 auto;
@@ -777,15 +777,14 @@ button, input, select, textarea {
     justify-content: center;
     align-items: center;
     width: 100%;
-    max-width: 540px;
+    max-width: 580px;
     margin: 0 auto;
 }
 
 .hero-image-card {
     position: relative;
     width: 100%;
-    max-width: 540px;
-    aspect-ratio: 16 / 10;
+    max-width: 580px;
     border-radius: 18px;
     background: radial-gradient(circle at 50% 35%, #14463c 0%, #0d382f 60%, #07211b 100%);
     border: 2px solid rgba(197, 155, 39, 0.45);
@@ -805,15 +804,17 @@ button, input, select, textarea {
 
 .hero-custom-img {
     width: 100%;
-    height: 100%;
-    object-fit: cover;
-    object-position: center center;
+    height: auto;
+    max-height: 520px;
+    object-fit: contain;
     display: block;
+    margin: 0 auto;
+    border-radius: 16px;
     transition: transform 0.5s ease;
 }
 
 .hero-image-card:hover .hero-custom-img {
-    transform: scale(1.02);
+    transform: scale(1.015);
 }
 
 .card-border-ornament {
@@ -3888,12 +3889,12 @@ img, iframe, video {
     }
 
     .hero-visual {
-        max-width: 440px;
+        max-width: 100%;
         margin: 0 auto;
     }
 
     .hero-image-card {
-        max-width: 440px;
+        max-width: 100%;
     }
 
     .about-points {
@@ -3948,14 +3949,14 @@ img, iframe, video {
 
     .hero-visual {
         order: 2;
-        max-width: 380px;
+        max-width: 460px;
         width: 100%;
         margin: 0 auto 0.75rem;
     }
 
     .hero-image-card {
-        max-width: 380px;
-        aspect-ratio: 16 / 10;
+        max-width: 460px;
+        width: 100%;
         border-radius: 14px;
         box-shadow: 0 10px 25px rgba(13, 56, 47, 0.12), 0 0 15px rgba(197, 155, 39, 0.1);
     }
