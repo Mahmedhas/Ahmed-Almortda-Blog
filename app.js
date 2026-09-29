@@ -2454,17 +2454,57 @@ function initEventListeners() {
     const mobileBtn = document.getElementById('mobileMenuBtn');
     const navMenu = document.getElementById('navMenu');
     if (mobileBtn && navMenu) {
-        mobileBtn.addEventListener('click', () => {
-            navMenu.classList.toggle('open');
-            const isOpen = navMenu.classList.contains('open');
-            mobileBtn.innerHTML = isOpen ? '<i class="fa-solid fa-xmark"></i>' : '<i class="fa-solid fa-bars"></i>';
-        });
-
-        navMenu.querySelectorAll('.nav-link').forEach(link => {
-            link.addEventListener('click', () => {
+        const closeMobileMenu = () => {
+            if (navMenu.classList.contains('open')) {
                 navMenu.classList.remove('open');
                 mobileBtn.innerHTML = '<i class="fa-solid fa-bars"></i>';
-            });
+                mobileBtn.setAttribute('aria-expanded', 'false');
+            }
+        };
+
+        const toggleMobileMenu = (e) => {
+            if (e) e.stopPropagation();
+            const isOpen = navMenu.classList.toggle('open');
+            mobileBtn.innerHTML = isOpen ? '<i class="fa-solid fa-xmark"></i>' : '<i class="fa-solid fa-bars"></i>';
+            mobileBtn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+        };
+
+        mobileBtn.addEventListener('click', toggleMobileMenu);
+
+        navMenu.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', closeMobileMenu);
+        });
+
+        // إغلاق القائمة تلقائياً عند النقر في أي مكان خارجها (Outside-Click)
+        document.addEventListener('click', (e) => {
+            if (navMenu.classList.contains('open')) {
+                if (!navMenu.contains(e.target) && !mobileBtn.contains(e.target)) {
+                    closeMobileMenu();
+                }
+            }
+        });
+
+        // إغلاق القائمة عند لمس الشاشة خارجها في شاشات الموبايل
+        document.addEventListener('touchstart', (e) => {
+            if (navMenu.classList.contains('open')) {
+                if (!navMenu.contains(e.target) && !mobileBtn.contains(e.target)) {
+                    closeMobileMenu();
+                }
+            }
+        }, { passive: true });
+
+        // إغلاق القائمة عند الضغط على زر Esc في لوحة المفاتيح
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && navMenu.classList.contains('open')) {
+                closeMobileMenu();
+            }
+        });
+
+        // إغلاق القائمة تلقائياً عند الانتقال إلى شاشة الكمبيوتر
+        window.addEventListener('resize', () => {
+            if (window.innerWidth > 860 && navMenu.classList.contains('open')) {
+                closeMobileMenu();
+            }
         });
     }
 
