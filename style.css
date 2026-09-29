@@ -482,6 +482,13 @@ button, input, select, textarea {
     max-width: var(--container-width, 1200px);
     margin: 0 auto;
     width: 100%;
+    transition: grid-template-columns 0.3s ease, gap 0.3s ease;
+}
+
+.hero-container.has-portrait-hero,
+.hero-container:has(.hero-image-card.is-portrait) {
+    grid-template-columns: 1.25fr 0.75fr;
+    gap: 3rem;
 }
 
 .hero-content {
@@ -779,11 +786,17 @@ button, input, select, textarea {
     width: 100%;
     max-width: 580px;
     margin: 0 auto;
+    transition: max-width 0.3s ease;
+}
+
+.hero-container.has-portrait-hero .hero-visual,
+.hero-container:has(.hero-image-card.is-portrait) .hero-visual {
+    max-width: 400px;
 }
 
 .hero-image-card {
     position: relative;
-    width: 100%;
+    width: fit-content;
     max-width: 580px;
     border-radius: 18px;
     background: radial-gradient(circle at 50% 35%, #14463c 0%, #0d382f 60%, #07211b 100%);
@@ -793,6 +806,7 @@ button, input, select, textarea {
     display: flex;
     align-items: center;
     justify-content: center;
+    margin: 0 auto;
     transition: all var(--transition-normal);
 }
 
@@ -802,10 +816,37 @@ button, input, select, textarea {
     border-color: var(--gold);
 }
 
-.hero-custom-img {
+/* التكيف التلقائي مع الصور الطولية (Portrait) */
+.hero-image-card.is-portrait {
+    max-width: 360px;
+    width: fit-content;
+}
+
+.hero-image-card.is-portrait .hero-custom-img {
+    width: auto;
+    height: auto;
+    max-width: 100%;
+    max-height: 510px;
+    object-fit: contain;
+}
+
+/* التكيف التلقائي مع الصور العرضية (Landscape) */
+.hero-image-card.is-landscape {
+    width: 100%;
+    max-width: 580px;
+}
+
+.hero-image-card.is-landscape .hero-custom-img {
     width: 100%;
     height: auto;
-    max-height: 520px;
+    max-height: 480px;
+    object-fit: contain;
+}
+
+.hero-custom-img {
+    max-width: 100%;
+    height: auto;
+    max-height: 510px;
     object-fit: contain;
     display: block;
     margin: 0 auto;
@@ -3868,6 +3909,12 @@ img, iframe, video {
         max-width: 100%;
     }
 
+    .hero-container.has-portrait-hero,
+    .hero-container:has(.hero-image-card.is-portrait) {
+        grid-template-columns: 1.2fr 0.8fr;
+        gap: 2rem;
+    }
+
     .hero-title {
         font-size: 2.45rem;
     }
@@ -3895,6 +3942,14 @@ img, iframe, video {
 
     .hero-image-card {
         max-width: 100%;
+    }
+
+    .hero-image-card.is-portrait {
+        max-width: 320px;
+    }
+
+    .hero-image-card.is-portrait .hero-custom-img {
+        max-height: 450px;
     }
 
     .about-points {
@@ -3954,11 +4009,37 @@ img, iframe, video {
         margin: 0 auto 0.75rem;
     }
 
+    .hero-container.has-portrait-hero .hero-visual,
+    .hero-container:has(.hero-image-card.is-portrait) .hero-visual {
+        max-width: 300px;
+    }
+
     .hero-image-card {
         max-width: 460px;
-        width: 100%;
+        width: fit-content;
+        margin: 0 auto;
         border-radius: 14px;
         box-shadow: 0 10px 25px rgba(13, 56, 47, 0.12), 0 0 15px rgba(197, 155, 39, 0.1);
+    }
+
+    .hero-image-card.is-portrait {
+        max-width: 280px;
+        width: fit-content;
+    }
+
+    .hero-image-card.is-portrait .hero-custom-img {
+        max-height: 380px;
+        width: auto;
+    }
+
+    .hero-image-card.is-landscape {
+        max-width: 460px;
+        width: 100%;
+    }
+
+    .hero-image-card.is-landscape .hero-custom-img {
+        max-height: 290px;
+        width: 100%;
     }
 
     .hero-title {
@@ -4646,9 +4727,33 @@ img, iframe, video {
         margin: 0 auto 0.65rem;
     }
 
+    .hero-container.has-portrait-hero .hero-visual,
+    .hero-container:has(.hero-image-card.is-portrait) .hero-visual {
+        max-width: 260px;
+    }
+
     .hero-image-card {
         max-width: 330px;
         border-radius: 12px;
+    }
+
+    .hero-image-card.is-portrait {
+        max-width: 250px;
+        width: fit-content;
+    }
+
+    .hero-image-card.is-portrait .hero-custom-img {
+        max-height: 330px;
+        width: auto;
+    }
+
+    .hero-image-card.is-landscape {
+        max-width: 330px;
+        width: 100%;
+    }
+
+    .hero-image-card.is-landscape .hero-custom-img {
+        max-height: 210px;
     }
 
     .hero-title {

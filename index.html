@@ -215,9 +215,40 @@
                             try {
                                 var s = JSON.parse(localStorage.getItem('sheikh_settings') || '{}');
                                 var u = s && s.heroMedia && (s.heroMedia.customImageUrl || s.heroMedia.imageUrl);
-                                if (u) {
-                                    var el = document.getElementById('heroCustomImage');
-                                    if (el && el.getAttribute('src') !== u) el.src = u;
+                                var card = document.getElementById('heroFeaturedImageCard');
+                                var container = document.querySelector('.hero-container');
+                                var savedOri = localStorage.getItem('hero_orientation');
+                                if (savedOri === 'portrait' && card) {
+                                    card.classList.add('is-portrait');
+                                    if (container) container.classList.add('has-portrait-hero');
+                                } else if (savedOri === 'landscape' && card) {
+                                    card.classList.add('is-landscape');
+                                    if (container) container.classList.remove('has-portrait-hero');
+                                }
+                                var el = document.getElementById('heroCustomImage');
+                                if (el) {
+                                    if (u && el.getAttribute('src') !== u) el.src = u;
+                                    function checkOrientation() {
+                                        var c = document.getElementById('heroFeaturedImageCard');
+                                        var ct = document.querySelector('.hero-container');
+                                        if (!c || !el.naturalWidth || !el.naturalHeight) return;
+                                        if (el.naturalHeight > el.naturalWidth) {
+                                            c.classList.add('is-portrait');
+                                            c.classList.remove('is-landscape');
+                                            if (ct) ct.classList.add('has-portrait-hero');
+                                            try { localStorage.setItem('hero_orientation', 'portrait'); } catch(e){}
+                                        } else {
+                                            c.classList.add('is-landscape');
+                                            c.classList.remove('is-portrait');
+                                            if (ct) ct.classList.remove('has-portrait-hero');
+                                            try { localStorage.setItem('hero_orientation', 'landscape'); } catch(e){}
+                                        }
+                                    }
+                                    if (el.complete && el.naturalWidth) {
+                                        checkOrientation();
+                                    } else {
+                                        el.addEventListener('load', checkOrientation);
+                                    }
                                 }
                             } catch(e) {}
                         })();

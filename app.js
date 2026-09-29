@@ -783,6 +783,28 @@ function applyServerSettings(settings) {
             customImg.src = imgUrl;
         }
         customImg.alt = heroMedia.title || heroMedia.imageTitle || 'فضيلة الشيخ أحمد مرتضى حامد';
+
+        const updateOrientation = () => {
+            const card = document.getElementById('heroFeaturedImageCard');
+            const container = document.querySelector('.hero-container');
+            if (!card || !customImg.naturalWidth || !customImg.naturalHeight) return;
+            if (customImg.naturalHeight > customImg.naturalWidth) {
+                card.classList.add('is-portrait');
+                card.classList.remove('is-landscape');
+                if (container) container.classList.add('has-portrait-hero');
+                try { localStorage.setItem('hero_orientation', 'portrait'); } catch(e){}
+            } else {
+                card.classList.add('is-landscape');
+                card.classList.remove('is-portrait');
+                if (container) container.classList.remove('has-portrait-hero');
+                try { localStorage.setItem('hero_orientation', 'landscape'); } catch(e){}
+            }
+        };
+        if (customImg.complete && customImg.naturalWidth) {
+            updateOrientation();
+        } else {
+            customImg.addEventListener('load', updateOrientation, { once: true });
+        }
     }
     if (customTitle) {
         customTitle.textContent = heroMedia.title || heroMedia.imageTitle || 'فضيلة الشيخ أحمد مرتضى حامد';
