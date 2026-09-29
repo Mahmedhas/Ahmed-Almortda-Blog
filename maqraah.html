@@ -21,60 +21,72 @@
     <!-- الخطوط والأيقونات -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400;1,700&family=Cairo:wght@400;500;600;700;800;900&family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     
     <!-- ملف الأنماط الموحد -->
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css?v=8.0">
 </head>
 <body class="maqraah-page-body">
 
-    <!-- شريط الإعلان والتنبيهات العلوي -->
-    <header class="top-bar" id="mainHeader">
+    <!-- الهالة الزخرفية الإسلامية العلوية -->
+    <div class="islamic-aura-bg"></div>
+
+    <!-- شريط الإعلان والتنبيهات العلوي والبسملة الشريفة -->
+    <div class="top-bar">
         <div class="container top-bar-content">
-            <div class="sheikh-branding">
-                <a href="index.html" class="branding-link" title="العودة للصفحة الرئيسية للمنصة">
-                    <div class="sheikh-crest">
-                        <i class="fa-solid fa-star-and-crescent crest-star"></i>
-                    </div>
-                    <div class="sheikh-text-group">
-                        <span class="sheikh-name">فضيلة الشيخ أحمد مرتضى حامد</span>
-                        <span class="sheikh-sub">ساحة الأقصر المباركة • المقرأة القرآنية</span>
-                    </div>
-                </a>
+            <span class="basmala-text" id="topAnnouncementText">﷽ &nbsp;•&nbsp; المقرأة القرآنية المباركة • ساحة فضيلة الشيخ أحمد مرتضى حامد بالأقصر</span>
+            <div class="top-bar-links">
+                <span class="location-tag"><i class="fa-solid fa-mosque"></i> ساحة العلم والمحبة • الأقصر</span>
             </div>
+        </div>
+    </div>
 
-            <!-- أزرار الإجراءات السريعة في الهيدر -->
+    <!-- شريط التنقل الرئيسي الثابت والفاخر -->
+    <header class="main-header" id="mainHeader">
+        <div class="container nav-container">
+            <!-- الشعار والهوية -->
+            <a href="index.html" class="brand-logo" title="العودة للصفحة الرئيسية للمنصة">
+                <div class="crest-icon">
+                    <i class="fa-solid fa-kaaba"></i>
+                </div>
+                <div class="brand-info">
+                    <span class="brand-sub">المدونة الرسمية</span>
+                    <h1 class="brand-name">الشيخ أحمد مرتضى</h1>
+                </div>
+            </a>
+
+            <!-- روابط القائمة الرئيسية -->
+            <nav class="nav-menu" id="navMenu">
+                <a href="index.html#hero" class="nav-link"><i class="fa-solid fa-house-chimney"></i> الرئيسية</a>
+                <a href="index.html#about" class="nav-link"><i class="fa-solid fa-user-tie"></i> عن الشيخ</a>
+                <a href="index.html#videosSection" class="nav-link"><i class="fa-solid fa-film"></i> المكتبة المرئية</a>
+                <a href="maqraah.html" class="nav-link active"><i class="fa-solid fa-quran"></i> المقرأة القرآنية</a>
+                <a href="index.html#scheduleSection" class="nav-link"><i class="fa-solid fa-calendar-check"></i> مواعيد الدروس</a>
+                <a href="index.html#quotesSection" class="nav-link"><i class="fa-solid fa-feather-pointed"></i> درر ومواعظ</a>
+                <a href="index.html#tasbihSection" class="nav-link"><i class="fa-solid fa-hand-holding-heart"></i> المسبحة</a>
+                <a href="index.html#footerSocial" class="nav-link"><i class="fa-solid fa-share-nodes"></i> منصات التواصل</a>
+            </nav>
+
+            <!-- أزرار الإجراءات السريعة -->
             <div class="header-actions">
-                <a href="index.html" class="btn btn-outline btn-sm home-back-btn" title="العودة للصفحة الرئيسية">
+                <a href="index.html" class="btn btn-gold btn-sm" title="العودة للصفحة الرئيسية">
                     <i class="fa-solid fa-house"></i>
-                    <span>الرئيسية</span>
+                    <span class="btn-text">الرئيسية</span>
                 </a>
 
-                <button type="button" class="theme-toggle-btn" id="themeToggleBtn" title="تبديل الوضع الليلي والنهاري" aria-label="تبديل مظهر الموقع">
+                <!-- تبديل الوضع الليلي / النهاري -->
+                <button id="themeToggleBtn" class="btn-icon theme-toggle" title="تبديل الوضع الليلي / النهاري">
                     <i class="fa-solid fa-moon theme-icon"></i>
                 </button>
 
-                <button type="button" class="mobile-menu-btn" id="mobileMenuBtn" aria-label="فتح القائمة المتنقلة" aria-expanded="false">
+                <!-- زر القائمة للهاتف -->
+                <button id="mobileMenuBtn" class="mobile-toggle-btn" aria-label="فتح القائمة">
                     <i class="fa-solid fa-bars"></i>
                 </button>
             </div>
         </div>
     </header>
-
-    <!-- قائمة التنقل الرئيسية -->
-    <nav class="main-nav" id="mainNav">
-        <div class="container nav-content">
-            <ul class="nav-links" id="navMenu">
-                <li><a href="index.html" class="nav-link"><i class="fa-solid fa-house"></i> الرئيسية</a></li>
-                <li><a href="index.html#videosSection" class="nav-link"><i class="fa-solid fa-play"></i> الدروس والمرئيات</a></li>
-                <li><a href="index.html#quotesSection" class="nav-link"><i class="fa-solid fa-feather"></i> درر وحكم إيمانية</a></li>
-                <li><a href="index.html#tasbihSection" class="nav-link"><i class="fa-solid fa-fingerprint"></i> المسبحة الإلكترونية</a></li>
-                <li><a href="maqraah.html" class="nav-link active"><i class="fa-solid fa-quran"></i> المقرأة القرآنية</a></li>
-                <li><a href="index.html#contactSection" class="nav-link"><i class="fa-solid fa-location-dot"></i> زيارة الساحة والتواصل</a></li>
-            </ul>
-        </div>
-    </nav>
 
     <!-- هيرو ترحيبي روحي خاص بصفحة المقرأة -->
     <section class="maqraah-page-hero">
@@ -91,8 +103,9 @@
     </section>
 
     <!-- الحاوية الشاملة لقسم المقرأة القرآنية -->
-    <main class="container" style="margin-bottom: 5rem;">
-        <section class="maqraah-section" id="maqraahSection">
+    <main id="mainContent">
+        <section class="section-container maqraah-section" id="maqraahSection">
+            <div class="container">
             
             <!-- أشرطة التبويبات الثلاثة -->
             <div class="maqraah-tabs-bar" role="tablist">
@@ -413,56 +426,73 @@
                 </div>
             </div>
 
+            </div> <!-- /.container -->
         </section>
     </main>
 
-    <!-- تذييل الصفحة -->
-    <footer class="site-footer">
-        <div class="container footer-content">
-            <div class="footer-col branding-col">
-                <div class="footer-crest">
-                    <i class="fa-solid fa-star-and-crescent"></i>
+    <!-- تذييل الصفحة الرسمي الموحد -->
+    <footer class="main-footer" id="footerSocial">
+        <div class="container footer-container">
+            <div class="footer-col brand-col">
+                <div class="footer-logo">
+                    <i class="fa-solid fa-kaaba gold-icon"></i>
+                    <h3>الشيخ أحمد مرتضى حامد</h3>
                 </div>
-                <h3>فضيلة الشيخ أحمد مرتضى حامد</h3>
-                <p>صوت الأصالة والاعتدال من رحاب ساحة الأقصر المباركة. نسأل الله أن يتقبل هذا العمل خالصاً لوجهه الكريم.</p>
-                <div class="footer-social-links">
-                    <a href="https://www.youtube.com/@sheikh-ahmed-mortada" target="_blank" rel="noopener" title="قناة يوتيوب الرسمية"><i class="fa-brands fa-youtube"></i></a>
-                    <a href="https://www.facebook.com" target="_blank" rel="noopener" title="صفحة فيسبوك الرسمية"><i class="fa-brands fa-facebook-f"></i></a>
-                    <a href="https://api.whatsapp.com" target="_blank" rel="noopener" title="واتساب الساحة"><i class="fa-brands fa-whatsapp"></i></a>
+                <p class="footer-about">
+                    المدونة الرسمية والمكتبة المرئية لفضيلة الشيخ أحمد مرتضى حامد، تُعنى بنشر العلم النافع وتوثيق الدروس والمحاضرات الإيمانية ومجالس السيرة وتزكية القلوب للمحبين وطالبي العلم حول العالم.
+                </p>
+                <div class="footer-social-links" id="footerSocialLinks">
+                    <a href="https://www.youtube.com/@فضيلةالشيخاحمدمرتضى" target="_blank" rel="noopener" class="social-btn youtube" title="قناة فضيلة الشيخ على يوتيوب">
+                        <i class="fa-brands fa-youtube"></i>
+                    </a>
                 </div>
             </div>
 
-            <div class="footer-col links-col">
-                <h4>أقسام المنصة</h4>
-                <ul>
-                    <li><a href="index.html"><i class="fa-solid fa-angle-left"></i> الرئيسية</a></li>
-                    <li><a href="index.html#videosSection"><i class="fa-solid fa-angle-left"></i> مكتبة الدروس والمرئيات</a></li>
-                    <li><a href="index.html#quotesSection"><i class="fa-solid fa-angle-left"></i> درر ومواعظ إيمانية</a></li>
-                    <li><a href="index.html#tasbihSection"><i class="fa-solid fa-angle-left"></i> المسبحة الإلكترونية</a></li>
-                    <li><a href="maqraah.html"><i class="fa-solid fa-angle-left"></i> المقرأة القرآنية والمصحف المعلم</a></li>
-                    <li><a href="index.html#contactSection"><i class="fa-solid fa-angle-left"></i> عنوان الساحة والتواصل</a></li>
+            <div class="footer-col">
+                <h4 class="footer-heading">روابط سريعة</h4>
+                <ul class="footer-links">
+                    <li><a href="index.html#hero"><i class="fa-solid fa-chevron-left"></i> الرئيسية</a></li>
+                    <li><a href="index.html#about"><i class="fa-solid fa-chevron-left"></i> سيرة ومنهج الشيخ</a></li>
+                    <li><a href="index.html#videosSection"><i class="fa-solid fa-chevron-left"></i> المكتبة المرئية الشاملة</a></li>
+                    <li><a href="maqraah.html"><i class="fa-solid fa-chevron-left"></i> المقرأة القرآنية والمصحف</a></li>
+                    <li><a href="index.html#scheduleSection"><i class="fa-solid fa-chevron-left"></i> مواعيد الدروس والمجالس</a></li>
+                    <li><a href="index.html#tasbihSection"><i class="fa-solid fa-chevron-left"></i> المسبحة الإلكترونية</a></li>
                 </ul>
             </div>
 
-            <div class="footer-col info-col">
-                <h4>المقرأة القرآنية</h4>
-                <p><i class="fa-solid fa-location-dot gold-icon"></i> ساحة فضيلة الشيخ أحمد مرتضى حامد - الأقصر، جمهورية مصر العربية.</p>
-                <p><i class="fa-solid fa-book-open gold-icon"></i> تلاوة برواية حفص عن عاصم وبأصوات كبار المقرئين الأزهريين.</p>
-                <p><i class="fa-solid fa-heart gold-icon"></i> حلقات مجانية مباركة لوجه الله تعالى.</p>
+            <div class="footer-col contact-col">
+                <h4 class="footer-heading">مقر الساحة واللقاءات (الأقصر)</h4>
+                <p class="footer-address">
+                    <i class="fa-solid fa-location-dot gold-icon"></i>
+                    جمهورية مصر العربية - محافظة الأقصر
+                </p>
+                <p class="footer-timing">
+                    <i class="fa-solid fa-door-open gold-icon"></i>
+                    الساحة مفتوحة دائماً لضيوف الرحمن والمحبين وطلاب العلم.
+                </p>
+                <div class="footer-badge-clean">
+                    <i class="fa-solid fa-kaaba"></i> منارة العلم والمحبة النبوية
+                </div>
             </div>
         </div>
 
         <div class="footer-bottom">
             <div class="container footer-bottom-content">
-                <p>© <span id="currentYear">2026</span> الموقع والمنصة الرسمية لفضيلة الشيخ أحمد مرتضى حامد. جميع الحقوق محفوظة.</p>
+                <p>جميع الحقوق محفوظة © <span id="currentYear"></span> - مدونة فضيلة الشيخ أحمد مرتضى حامد الرسمية</p>
+                <p class="duaa-text">«اللَّهُمَّ انْفَعْنَا بِمَا عَلَّمْتَنَا، وَعَلِّمْنَا مَا يَنْفَعُنَا، وَزِدْنَا عِلْمًا»</p>
             </div>
         </div>
     </footer>
+
+    <!-- زر الصعود لأعلى الصفحة -->
+    <button id="backToTopBtn" class="back-to-top" title="العودة لأعلى الصفحة" aria-label="العودة لأعلى الصفحة">
+        <i class="fa-solid fa-chevron-up"></i>
+    </button>
 
     <!-- حاوية إشعارات Toast -->
     <div id="toastContainer" class="toast-container" aria-live="polite"></div>
 
     <!-- المحرك البرمجي للمقرأة -->
-    <script src="maqraah.js"></script>
+    <script src="maqraah.js?v=2.0"></script>
 </body>
 </html>

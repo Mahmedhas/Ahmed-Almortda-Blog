@@ -492,6 +492,7 @@ function playCelebrationSound() {
 document.addEventListener('DOMContentLoaded', () => {
     initTheme();
     initMobileNav();
+    initBackToTop();
     initMaqraahEngine();
 
     const yearEl = document.getElementById('currentYear');
@@ -547,12 +548,39 @@ function initMobileNav() {
             link.addEventListener('click', closeMobileMenu);
         });
 
-        document.addEventListener('click', (e) => {
-            if (navMenu.classList.contains('open')) {
-                if (!navMenu.contains(e.target) && !mobileBtn.contains(e.target)) {
-                    closeMobileMenu();
+        // Close when clicking outside
+        ['click', 'touchstart'].forEach(evt => {
+            document.addEventListener(evt, (e) => {
+                if (navMenu.classList.contains('open')) {
+                    if (!navMenu.contains(e.target) && !mobileBtn.contains(e.target)) {
+                        closeMobileMenu();
+                    }
                 }
+            }, { passive: true });
+        });
+
+        // Close on Escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && navMenu.classList.contains('open')) {
+                closeMobileMenu();
             }
+        });
+    }
+}
+
+function initBackToTop() {
+    const backBtn = document.getElementById('backToTopBtn');
+    if (backBtn) {
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 400) {
+                backBtn.classList.add('visible');
+            } else {
+                backBtn.classList.remove('visible');
+            }
+        }, { passive: true });
+
+        backBtn.addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         });
     }
 }
