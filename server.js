@@ -70,9 +70,18 @@ function syncHeroImageInIndexHtml(settings) {
             }
         }
 
+        const toFullUrl = (u) => {
+            if (!u) return '';
+            if (u.startsWith('http://') || u.startsWith('https://')) return u;
+            return `https://sheikh-ahmed-mortada.com/${u.replace(/^\/+/, '')}`;
+        };
+        const fullHeroImg = toFullUrl(heroImg);
+
         // تحديث وسوم المشاركة og:image و twitter:image و schema.org
-        html = html.replace(/(<meta\s+property=["']og:image["']\s+content=["'])([^"']+)(["']>)/i, `$1${heroImg}$3`);
-        html = html.replace(/(<meta\s+name=["']twitter:image["']\s+content=["'])([^"']+)(["']>)/i, `$1${heroImg}$3`);
+        html = html.replace(/(<meta\s+property=["']og:image["']\s+content=["'])([^"']+)(["']>)/i, `$1${fullHeroImg}$3`);
+        html = html.replace(/(<meta\s+property=["']og:image:secure_url["']\s+content=["'])([^"']+)(["']>)/i, `$1${fullHeroImg}$3`);
+        html = html.replace(/(<meta\s+name=["']twitter:image["']\s+content=["'])([^"']+)(["']>)/i, `$1${fullHeroImg}$3`);
+        html = html.replace(/("url":\s*")([^"]+uploads\/hero_[^"]+)(")/i, `$1${fullHeroImg}$3`);
 
         fs.writeFileSync(indexPath, html, 'utf-8');
         console.log(`[HeroSync] تم تحديث صورة الهيرو في index.html بنجاح: ${heroImg}`);
@@ -867,8 +876,16 @@ const server = http.createServer((req, res) => {
                             html = html.replace(imgRegexAlt, `$1${heroImg}$3`);
                         }
                     }
-                    html = html.replace(/(<meta\s+property=["']og:image["']\s+content=["'])([^"']+)(["']>)/i, `$1${heroImg}$3`);
-                    html = html.replace(/(<meta\s+name=["']twitter:image["']\s+content=["'])([^"']+)(["']>)/i, `$1${heroImg}$3`);
+                    const toFullUrl = (u) => {
+                        if (!u) return '';
+                        if (u.startsWith('http://') || u.startsWith('https://')) return u;
+                        return `https://sheikh-ahmed-mortada.com/${u.replace(/^\/+/, '')}`;
+                    };
+                    const fullHeroImg = toFullUrl(heroImg);
+                    html = html.replace(/(<meta\s+property=["']og:image["']\s+content=["'])([^"']+)(["']>)/i, `$1${fullHeroImg}$3`);
+                    html = html.replace(/(<meta\s+property=["']og:image:secure_url["']\s+content=["'])([^"']+)(["']>)/i, `$1${fullHeroImg}$3`);
+                    html = html.replace(/(<meta\s+name=["']twitter:image["']\s+content=["'])([^"']+)(["']>)/i, `$1${fullHeroImg}$3`);
+                    html = html.replace(/("url":\s*")([^"]+uploads\/hero_[^"]+)(")/i, `$1${fullHeroImg}$3`);
                 }
 
                 const acceptEncoding = req.headers['accept-encoding'] || '';
