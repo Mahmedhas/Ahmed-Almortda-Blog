@@ -522,23 +522,17 @@ button, input, select, textarea {
 }
 
 .hero-title {
-    font-size: 2.55rem;
-    margin-bottom: 1.25rem;
+    font-size: 2.75rem;
+    margin-top: 0;
+    margin-bottom: 1.15rem;
     color: var(--primary);
     letter-spacing: -0.5px;
-    line-height: 1.45;
-    padding-bottom: 0.35rem;
+    line-height: 1.35;
+    padding-bottom: 0.25rem;
 }
 
 .hero-title-prefix {
-    display: block;
-    font-size: 1.1rem;
-    font-family: var(--font-body);
-    font-weight: 600;
-    color: var(--text-secondary);
-    letter-spacing: 0.5px;
-    margin-bottom: 0.45rem;
-    line-height: 1.4;
+    display: none;
 }
 
 [data-theme="dark"] .hero-title-prefix {
@@ -557,10 +551,10 @@ button, input, select, textarea {
     -webkit-text-fill-color: transparent;
     font-weight: 700;
     filter: drop-shadow(0 1px 1px rgba(255, 255, 255, 0.7));
-    line-height: 1.45;
-    padding-top: 0.15rem;
-    padding-bottom: 0.6rem;
-    margin-bottom: -0.3rem;
+    line-height: 1.35;
+    padding-top: 0.1rem;
+    padding-bottom: 0.35rem;
+    margin-bottom: 0;
 }
 
 [data-theme="dark"] .highlight-name {
@@ -4134,15 +4128,12 @@ img, iframe, video {
 
     .hero-title {
         text-align: center;
-        font-size: 2.15rem;
-        line-height: 1.35;
+        font-size: 2.25rem;
+        line-height: 1.3;
+        margin-top: 0;
+        margin-bottom: 0.95rem;
         margin-left: auto;
         margin-right: auto;
-    }
-
-    .hero-title-prefix {
-        font-size: 1.05rem;
-        margin-bottom: 0.35rem;
     }
 
     .hero-desc {
@@ -4591,11 +4582,9 @@ img, iframe, video {
     }
 
     .hero-title {
-        font-size: 1.85rem;
-    }
-
-    .hero-title-prefix {
-        font-size: 0.95rem;
+        font-size: 1.95rem;
+        line-height: 1.3;
+        margin-bottom: 0.85rem;
     }
 
     .hero-badge {
