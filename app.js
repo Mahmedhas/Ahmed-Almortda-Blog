@@ -518,6 +518,7 @@ document.addEventListener('DOMContentLoaded', () => {
     renderQuotes();
     applyFiltersAndRender();
     initTasbih();
+    initMaqraahEngine();
 
     const yearEl = document.getElementById('currentYear');
     if (yearEl) yearEl.textContent = new Date().getFullYear();
@@ -2813,4 +2814,1478 @@ function showLocalFileBanner() {
         document.body.prepend(banner);
     }
 }
+
+// ==========================================================================
+// 21. المقرأة القرآنية التفاعلية والمصحف المعلم واختبارات التحفيظ والتسميع
+// ==========================================================================
+
+/**
+ * فهرس سور القرآن الكريم الـ ١١٤ بالكامل
+ */
+const QURAN_SURAHS = [
+    { number: 1, name: "الفاتحة", ayahs: 7, type: "مكية" },
+    { number: 2, name: "البقرة", ayahs: 286, type: "مدنية" },
+    { number: 3, name: "آل عمران", ayahs: 200, type: "مدنية" },
+    { number: 4, name: "النساء", ayahs: 176, type: "مدنية" },
+    { number: 5, name: "المائدة", ayahs: 120, type: "مدنية" },
+    { number: 6, name: "الأنعام", ayahs: 165, type: "مكية" },
+    { number: 7, name: "الأعراف", ayahs: 206, type: "مكية" },
+    { number: 8, name: "الأنفال", ayahs: 75, type: "مدنية" },
+    { number: 9, name: "التوبة", ayahs: 129, type: "مدنية" },
+    { number: 10, name: "يونس", ayahs: 109, type: "مكية" },
+    { number: 11, name: "هود", ayahs: 123, type: "مكية" },
+    { number: 12, name: "يوسف", ayahs: 111, type: "مكية" },
+    { number: 13, name: "الرعد", ayahs: 43, type: "مدنية" },
+    { number: 14, name: "إبراهيم", ayahs: 52, type: "مكية" },
+    { number: 15, name: "الحجر", ayahs: 99, type: "مكية" },
+    { number: 16, name: "النحل", ayahs: 128, type: "مكية" },
+    { number: 17, name: "الإسراء", ayahs: 111, type: "مكية" },
+    { number: 18, name: "الكهف", ayahs: 110, type: "مكية" },
+    { number: 19, name: "مريم", ayahs: 98, type: "مكية" },
+    { number: 20, name: "طه", ayahs: 135, type: "مكية" },
+    { number: 21, name: "الأنبياء", ayahs: 112, type: "مكية" },
+    { number: 22, name: "الحج", ayahs: 78, type: "مدنية" },
+    { number: 23, name: "المؤمنون", ayahs: 118, type: "مكية" },
+    { number: 24, name: "النور", ayahs: 64, type: "مدنية" },
+    { number: 25, name: "الفرقان", ayahs: 77, type: "مكية" },
+    { number: 26, name: "الشعراء", ayahs: 227, type: "مكية" },
+    { number: 27, name: "النمل", ayahs: 93, type: "مكية" },
+    { number: 28, name: "القصص", ayahs: 88, type: "مكية" },
+    { number: 29, name: "العنكبوت", ayahs: 69, type: "مكية" },
+    { number: 30, name: "الروم", ayahs: 60, type: "مكية" },
+    { number: 31, name: "لقمان", ayahs: 34, type: "مكية" },
+    { number: 32, name: "السجدة", ayahs: 30, type: "مكية" },
+    { number: 33, name: "الأحزاب", ayahs: 73, type: "مدنية" },
+    { number: 34, name: "سبأ", ayahs: 54, type: "مكية" },
+    { number: 35, name: "فاطر", ayahs: 45, type: "مكية" },
+    { number: 36, name: "يس", ayahs: 83, type: "مكية" },
+    { number: 37, name: "الصافات", ayahs: 182, type: "مكية" },
+    { number: 38, name: "ص", ayahs: 88, type: "مكية" },
+    { number: 39, name: "الزمر", ayahs: 75, type: "مكية" },
+    { number: 40, name: "غافر", ayahs: 85, type: "مكية" },
+    { number: 41, name: "فصلت", ayahs: 54, type: "مكية" },
+    { number: 42, name: "الشورى", ayahs: 53, type: "مكية" },
+    { number: 43, name: "الزخرف", ayahs: 89, type: "مكية" },
+    { number: 44, name: "الدخان", ayahs: 59, type: "مكية" },
+    { number: 45, name: "الجاثية", ayahs: 37, type: "مكية" },
+    { number: 46, name: "الأحقاف", ayahs: 35, type: "مكية" },
+    { number: 47, name: "محمد", ayahs: 38, type: "مدنية" },
+    { number: 48, name: "الفتح", ayahs: 29, type: "مدنية" },
+    { number: 49, name: "الحجرات", ayahs: 18, type: "مدنية" },
+    { number: 50, name: "ق", ayahs: 45, type: "مكية" },
+    { number: 51, name: "الذاريات", ayahs: 60, type: "مكية" },
+    { number: 52, name: "الطور", ayahs: 49, type: "مكية" },
+    { number: 53, name: "النجم", ayahs: 62, type: "مكية" },
+    { number: 54, name: "القمر", ayahs: 55, type: "مكية" },
+    { number: 55, name: "الرحمن", ayahs: 78, type: "مدنية" },
+    { number: 56, name: "الواقعة", ayahs: 96, type: "مكية" },
+    { number: 57, name: "الحديد", ayahs: 29, type: "مدنية" },
+    { number: 58, name: "المجادلة", ayahs: 22, type: "مدنية" },
+    { number: 59, name: "الحشر", ayahs: 24, type: "مدنية" },
+    { number: 60, name: "الممتحنة", ayahs: 13, type: "مدنية" },
+    { number: 61, name: "الصف", ayahs: 14, type: "مدنية" },
+    { number: 62, name: "الجمعة", ayahs: 11, type: "مدنية" },
+    { number: 63, name: "المنافقون", ayahs: 11, type: "مدنية" },
+    { number: 64, name: "التغابن", ayahs: 18, type: "مدنية" },
+    { number: 65, name: "الطلاق", ayahs: 12, type: "مدنية" },
+    { number: 66, name: "التحريم", ayahs: 12, type: "مدنية" },
+    { number: 67, name: "الملك", ayahs: 30, type: "مكية" },
+    { number: 68, name: "القلم", ayahs: 52, type: "مكية" },
+    { number: 69, name: "الحاقة", ayahs: 52, type: "مكية" },
+    { number: 70, name: "المعارج", ayahs: 44, type: "مكية" },
+    { number: 71, name: "نوح", ayahs: 28, type: "مكية" },
+    { number: 72, name: "الجن", ayahs: 28, type: "مكية" },
+    { number: 73, name: "المزمل", ayahs: 20, type: "مكية" },
+    { number: 74, name: "المدثر", ayahs: 56, type: "مكية" },
+    { number: 75, name: "القيامة", ayahs: 40, type: "مكية" },
+    { number: 76, name: "الإنسان", ayahs: 31, type: "مدنية" },
+    { number: 77, name: "المرسلات", ayahs: 50, type: "مكية" },
+    { number: 78, name: "النبأ", ayahs: 40, type: "مكية" },
+    { number: 79, name: "النازعات", ayahs: 46, type: "مكية" },
+    { number: 80, name: "عبس", ayahs: 42, type: "مكية" },
+    { number: 81, name: "التكوير", ayahs: 29, type: "مكية" },
+    { number: 82, name: "الانفطار", ayahs: 19, type: "مكية" },
+    { number: 83, name: "المطففين", ayahs: 36, type: "مكية" },
+    { number: 84, name: "الانشقاق", ayahs: 25, type: "مكية" },
+    { number: 85, name: "البروج", ayahs: 22, type: "مكية" },
+    { number: 86, name: "الطارق", ayahs: 17, type: "مكية" },
+    { number: 87, name: "الأعلى", ayahs: 19, type: "مكية" },
+    { number: 88, name: "الغاشية", ayahs: 26, type: "مكية" },
+    { number: 89, name: "الفجر", ayahs: 30, type: "مكية" },
+    { number: 90, name: "البلد", ayahs: 20, type: "مكية" },
+    { number: 91, name: "الشمس", ayahs: 15, type: "مكية" },
+    { number: 92, name: "الليل", ayahs: 21, type: "مكية" },
+    { number: 93, name: "الضحى", ayahs: 11, type: "مكية" },
+    { number: 94, name: "الشرح", ayahs: 8, type: "مكية" },
+    { number: 95, name: "التين", ayahs: 8, type: "مكية" },
+    { number: 96, name: "العلق", ayahs: 19, type: "مكية" },
+    { number: 97, name: "القدر", ayahs: 5, type: "مكية" },
+    { number: 98, name: "البينة", ayahs: 8, type: "مدنية" },
+    { number: 99, name: "الزلزلة", ayahs: 8, type: "مدنية" },
+    { number: 100, name: "العاديات", ayahs: 11, type: "مكية" },
+    { number: 101, name: "القارعة", ayahs: 11, type: "مكية" },
+    { number: 102, name: "التكاثر", ayahs: 8, type: "مكية" },
+    { number: 103, name: "العصر", ayahs: 3, type: "مكية" },
+    { number: 104, name: "الهمزة", ayahs: 9, type: "مكية" },
+    { number: 105, name: "الفيل", ayahs: 5, type: "مكية" },
+    { number: 106, name: "قريش", ayahs: 4, type: "مكية" },
+    { number: 107, name: "الماعون", ayahs: 7, type: "مكية" },
+    { number: 108, name: "الكوثر", ayahs: 3, type: "مكية" },
+    { number: 109, name: "الكافرون", ayahs: 6, type: "مكية" },
+    { number: 110, name: "النصر", ayahs: 3, type: "مدنية" },
+    { number: 111, name: "المسد", ayahs: 5, type: "مكية" },
+    { number: 112, name: "الإخلاص", ayahs: 4, type: "مكية" },
+    { number: 113, name: "الفلق", ayahs: 5, type: "مكية" },
+    { number: 114, name: "الناس", ayahs: 6, type: "مكية" }
+];
+
+/**
+ * قاعدة نصوص مسبقة التضمين لسرعة التحميل اللحظي حتى دون إنترنت
+ */
+const OFFLINE_SURAHS_DATA = {
+    1: [
+        { numberInSurah: 1, text: "بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ" },
+        { numberInSurah: 2, text: "ٱلْحَمْدُ لِلَّهِ رَبِّ ٱلْعَٰلَمِينَ" },
+        { numberInSurah: 3, text: "ٱلرَّحْمَٰنِ ٱلرَّحِيمِ" },
+        { numberInSurah: 4, text: "مَٰلِكِ يَوْمِ ٱلدِّينِ" },
+        { numberInSurah: 5, text: "إِيَّاكَ نَعْبُدُ وَإِيَّاكَ نَسْتَعِينُ" },
+        { numberInSurah: 6, text: "ٱهْدِنَا ٱلصِّرَٰطَ ٱلْمُسْتَقِيمَ" },
+        { numberInSurah: 7, text: "صِرَٰطَ ٱلَّذِينَ أَنْعَمْتَ عَلَيْهِمْ غَيْرِ ٱلْمَغْضُوبِ عَلَيْهِمْ وَلَا ٱلضَّآلِّينَ" }
+    ],
+    97: [
+        { numberInSurah: 1, text: "إِنَّآ أَنزَلْنَٰهُ فِى لَيْلَةِ ٱلْقَدْرِ" },
+        { numberInSurah: 2, text: "وَمَآ أَدْرَىٰكَ مَا لَيْلَةُ ٱلْقَدْرِ" },
+        { numberInSurah: 3, text: "لَيْلَةُ ٱلْقَدْرِ خَيْرٌۭ مِّنْ أَلْفِ شَهْرٍۢ" },
+        { numberInSurah: 4, text: "تَنَزَّلُ ٱلْمَلَٰٓئِكَةُ وَٱلرُّوحُ فِيهَا بِإِذْنِ رَبِّهِم مِّن كُلِّ أَمْرٍۢ" },
+        { numberInSurah: 5, text: "سَلَٰمٌ هِىَ حَتَّىٰ مَطْلَعِ ٱلْفَجْرِ" }
+    ],
+    103: [
+        { numberInSurah: 1, text: "وَٱلْعَصْرِ" },
+        { numberInSurah: 2, text: "إِنَّ ٱلْإِنسَٰنَ لَفِى خُسْرٍ" },
+        { numberInSurah: 3, text: "إِلَّا ٱلَّذِينَ ءَامَنُوا۟ وَعَمِلُوا۟ ٱلصَّٰلِحَٰتِ وَتَوَاصَوْا۟ بِٱلْحَقِّ وَتَوَاصَوْا۟ بِٱلصَّبْرِ" }
+    ],
+    108: [
+        { numberInSurah: 1, text: "إِنَّآ أَعْطَيْنَٰكَ ٱلْكَوْثَرَ" },
+        { numberInSurah: 2, text: "فَصَلِّ لِرَبِّكَ وَٱنْحَرْ" },
+        { numberInSurah: 3, text: "إِنَّ شَانِئَكَ هُوَ ٱلْأَبْتَرُ" }
+    ],
+    112: [
+        { numberInSurah: 1, text: "قُلْ هُوَ ٱللَّهُ أَحَدٌ" },
+        { numberInSurah: 2, text: "ٱللَّهُ ٱلصَّمَدُ" },
+        { numberInSurah: 3, text: "لَمْ يَلِدْ وَلَمْ يُولَدْ" },
+        { numberInSurah: 4, text: "وَلَمْ يَكُن لَّهُۥ كُفُوًا أَحَدٌۢ" }
+    ],
+    113: [
+        { numberInSurah: 1, text: "قُلْ أَعُوذُ بِرَبِّ ٱلْفَلَقِ" },
+        { numberInSurah: 2, text: "مِن شَرِّ مَا خَلَقَ" },
+        { numberInSurah: 3, text: "وَمِن شَرِّ غَاسِقٍ إِذَا وَقَبَ" },
+        { numberInSurah: 4, text: "وَمِن شَرِّ ٱلنَّفَّٰثَٰتِ فِى ٱلْعُقَدِ" },
+        { numberInSurah: 5, text: "وَمِن شَرِّ حَاسِدٍ إِذَا حَسَدَ" }
+    ],
+    114: [
+        { numberInSurah: 1, text: "قُلْ أَعُوذُ بِرَبِّ ٱلنَّاسِ" },
+        { numberInSurah: 2, text: "مَلِكِ ٱلنَّاسِ" },
+        { numberInSurah: 3, text: "إِلَٰهِ ٱلنَّاسِ" },
+        { numberInSurah: 4, text: "مِن شَرِّ ٱلْوَسْوَاسِ ٱلْخَنَّاسِ" },
+        { numberInSurah: 5, text: "ٱلَّذِى يُوَسْوِسُ فِى صُدُورِ ٱلنَّاسِ" },
+        { numberInSurah: 6, text: "مِنَ ٱلْجِنَّةِ وَٱلنَّاسِ" }
+    ]
+};
+
+/**
+ * بنك أسئلة اختبارات التحفيظ والتسميع الذكية
+ */
+const HIFZ_QUIZ_BANK = [
+    // --- جزء عم ---
+    {
+        scope: "juz_amma",
+        type: "next_ayah",
+        promptAyah: "عَمَّ يَتَسَآءَلُونَ",
+        sourceInfo: "سورة النبأ • الآية ١",
+        questionText: "ما هي الآية الكريمة التي تلي هذه الآية مباشرة؟",
+        options: [
+            "عَنِ ٱلنَّبَإِ ٱلْعَظِيمِ",
+            "ٱلَّذِى هُمْ فِيهِ مُخْتَلِفُونَ",
+            "كَلَّا سَيَعْلَمُونَ",
+            "أَلَمْ نَجْعَلِ ٱلْأَرْضَ مِهَٰدًۭا"
+        ],
+        correctIndex: 0,
+        explanation: "قال تعالى في مطلع سورة النبأ: ﴿عَمَّ يَتَسَآءَلُونَ ۝ عَنِ ٱلنَّبَإِ ٱلْعَظِيمِ﴾."
+    },
+    {
+        scope: "juz_amma",
+        type: "next_ayah",
+        promptAyah: "وَٱلنَّٰزِعَٰتِ غَرْقًۭا",
+        sourceInfo: "سورة النازعات • الآية ١",
+        questionText: "ما هي الآية التالية لقوله تعالى: «وَٱلنَّٰزِعَٰتِ غَرْقًۭا»؟",
+        options: [
+            "وَٱلنَّٰشِطَٰتِ نَشْطًۭا",
+            "وَٱلسَّٰبِحَٰتِ سَبْحًۭا",
+            "فَٱلسَّٰبِقَٰتِ سَبْقًۭا",
+            "فَٱلْمُدَبِّرَٰتِ أَمْرًۭا"
+        ],
+        correctIndex: 0,
+        explanation: "قال تعالى: ﴿وَٱلنَّٰزِعَٰتِ غَرْقًۭا ۝ وَٱلنَّٰشِطَٰتِ نَشْطًۭا﴾ في أوائل سورة النازعات."
+    },
+    {
+        scope: "juz_amma",
+        type: "surah_name",
+        promptAyah: "إِذَا ٱلشَّمْسُ كُوِّرَتْ ۝ وَإِذَا ٱلنُّجُومُ ٱنكَدَرَتْ",
+        sourceInfo: "القرآن الكريم",
+        questionText: "في أي سورة كريمة وردت هذه الآيات العظيمة؟",
+        options: [
+            "سورة التكوير",
+            "سورة الانفطار",
+            "سورة الانشقاق",
+            "سورة البروج"
+        ],
+        correctIndex: 0,
+        explanation: "هذا مطلع سورة التكوير المباركة."
+    },
+    {
+        scope: "juz_amma",
+        type: "next_ayah",
+        promptAyah: "إِذَا ٱلسَّمَآءُ ٱنفَطَرَتْ",
+        sourceInfo: "سورة الانفطار • الآية ١",
+        questionText: "أكمل الآية المباركة التالية:",
+        options: [
+            "وَإِذَا ٱلْكَوَاكِبُ ٱنتَثَرَتْ",
+            "وَإِذَا ٱلْبِحَارُ فُجِّرَتْ",
+            "وَإِذَا ٱلْقُبُورُ بُعْثِرَتْ",
+            "عَلِمَتْ نَفْسٌۭ مَّا قَدَّمَتْ وَأَخَّرَتْ"
+        ],
+        correctIndex: 0,
+        explanation: "قال تعالى في سورة الانفطار: ﴿إِذَا ٱلسَّمَآءُ ٱنفَطَرَتْ ۝ وَإِذَا ٱلْكَوَاكِبُ ٱنتَثَرَتْ﴾."
+    },
+    {
+        scope: "juz_amma",
+        type: "next_ayah",
+        promptAyah: "سَبِّحِ ٱسْمَ رَبِّكَ ٱلْأَعْلَى",
+        sourceInfo: "سورة الأعلى • الآية ١",
+        questionText: "ما هي الآية الكريمة التي تليها مباشرة؟",
+        options: [
+            "ٱلَّذِى خَلَقَ فَسَوَّىٰ",
+            "وَٱلَّذِى قَدَّرَ فَهَدَىٰ",
+            "وَٱلَّذِىٓ أَخْرَجَ ٱلْمَرْعَىٰ",
+            "فَجَعَلَهُۥ غُثَآءً أَحْوَىٰ"
+        ],
+        correctIndex: 0,
+        explanation: "قال تعالى: ﴿سَبِّحِ ٱسْمَ رَبِّكَ ٱلْأَعْلَى ۝ ٱلَّذِى خَلَقَ فَسَوَّىٰ﴾."
+    },
+    {
+        scope: "juz_amma",
+        type: "surah_name",
+        promptAyah: "هَلْ أَتَىٰكَ حَدِيثُ ٱلْغَاشِيَةِ",
+        sourceInfo: "القرآن الكريم",
+        questionText: "في أي سورة وردت هذه الآية المباركة؟",
+        options: [
+            "سورة الغاشية",
+            "سورة الفجر",
+            "سورة البلد",
+            "سورة الطارق"
+        ],
+        correctIndex: 0,
+        explanation: "الآية الأولى من سورة الغاشية."
+    },
+    {
+        scope: "juz_amma",
+        type: "next_ayah",
+        promptAyah: "وَٱلْفَجْرِ ۝ وَلَيَالٍ عَشْرٍۢ",
+        sourceInfo: "سورة الفجر • الآيتان ١-٢",
+        questionText: "ما الآية التي تلي هاتين الآيتين مباشرة؟",
+        options: [
+            "وَٱلشَّفْعِ وَٱلْوَتْرِ",
+            "وَٱلَّيْلِ إِذَا يَسْرِ",
+            "هَلْ فِى ذَٰلِكَ قَسَمٌۭ لِّذِى حِجْرٍ",
+            "أَلَمْ تَرَ كَيْفَ فَعَلَ رَبُّكَ بِعَادٍ"
+        ],
+        correctIndex: 0,
+        explanation: "قال تعالى في سورة الفجر: ﴿وَٱلْفَجْرِ ۝ وَلَيَالٍ عَشْرٍۢ ۝ وَٱلشَّفْعِ وَٱلْوَتْرِ﴾."
+    },
+    {
+        scope: "juz_amma",
+        type: "next_ayah",
+        promptAyah: "وَٱلشَّمْسِ وَضُحَىٰهَا",
+        sourceInfo: "سورة الشمس • الآية ١",
+        questionText: "ما هي الآية المباركة التالية؟",
+        options: [
+            "وَٱلْقَمَرِ إِذَا تَلَىٰهَا",
+            "وَٱلنَّهَارِ إِذَا جَلَّىٰهَا",
+            "وَٱلَّيْلِ إِذَا يَغْشَىٰهَا",
+            "وَٱلسَّمَآءِ وَمَا بَنَىٰهَا"
+        ],
+        correctIndex: 0,
+        explanation: "قال تعالى: ﴿وَٱلشَّمْسِ وَضُحَىٰهَا ۝ وَٱلْقَمَرِ إِذَا تَلَىٰهَا﴾."
+    },
+    {
+        scope: "juz_amma",
+        type: "next_ayah",
+        promptAyah: "وَٱلضُّحَىٰ ۝ وَٱلَّيْلِ إِذَا سَجَىٰ",
+        sourceInfo: "سورة الضحى • الآيتان ١-٢",
+        questionText: "أكمل الآية التالية:",
+        options: [
+            "مَا وَدَّعَكَ رَبُّكَ وَمَا قَلَىٰ",
+            "وَلَلْءَاخِرَةُ خَيْرٌۭ لَّكَ مِنَ ٱلْأُولَىٰ",
+            "وَلَسَوْفَ يُعْطِيكَ رَبُّكَ فَتَرْضَىٰ",
+            "أَلَمْ يَجِدْكَ يَتِيمًۭا فَـَٔاوَىٰ"
+        ],
+        correctIndex: 0,
+        explanation: "قال تعالى: ﴿مَا وَدَّعَكَ رَبُّكَ وَمَا قَلَىٰ﴾ في سورة الضحى."
+    },
+    {
+        scope: "juz_amma",
+        type: "surah_name",
+        promptAyah: "أَلَمْ نَشْرَحْ لَكَ صَدْرَكَ",
+        sourceInfo: "القرآن الكريم",
+        questionText: "في أي سورة وردت هذه الآية المباركة؟",
+        options: [
+            "سورة الشرح (الانشراح)",
+            "سورة الضحى",
+            "سورة العلق",
+            "سورة التين"
+        ],
+        correctIndex: 0,
+        explanation: "الآية الأولى من سورة الشرح."
+    },
+    {
+        scope: "juz_amma",
+        type: "next_ayah",
+        promptAyah: "إِنَّآ أَنزَلْنَٰهُ فِى لَيْلَةِ ٱلْقَدْرِ",
+        sourceInfo: "سورة القدر • الآية ١",
+        questionText: "أكمل الآية الكريمة التالية مباشرة:",
+        options: [
+            "وَمَآ أَدْرَىٰكَ مَا لَيْلَةُ ٱلْقَدْرِ",
+            "لَيْلَةُ ٱلْقَدْرِ خَيْرٌۭ مِّنْ أَلْفِ شَهْرٍۢ",
+            "تَنَزَّلُ ٱلْمَلَٰٓئِكَةُ وَٱلرُّوحُ فِيهَا",
+            "سَلَٰمٌ هِىَ حَتَّىٰ مَطْلَعِ ٱلْفَجْرِ"
+        ],
+        correctIndex: 0,
+        explanation: "قال تعالى: ﴿إِنَّآ أَنزَلْنَٰهُ فِى لَيْلَةِ ٱلْقَدْرِ ۝ وَمَآ أَدْرَىٰكَ مَا لَيْلَةُ ٱلْقَدْرِ﴾."
+    },
+    {
+        scope: "juz_amma",
+        type: "next_ayah",
+        promptAyah: "إِذَا زُلْزِلَتِ ٱلْأَرْضُ زِلْزَالَهَا",
+        sourceInfo: "سورة الزلزلة • الآية ١",
+        questionText: "ما هي الآية المباركة التالية؟",
+        options: [
+            "وَأَخْرَجَتِ ٱلْأَرْضُ أَثْقَالَهَا",
+            "وَقَالَ ٱلْإِنسَٰنُ مَا لَهَا",
+            "يَوْمَئِذٍۢ تُحَدِّثُ أَخْبَارَهَا",
+            "بِأَنَّ رَبَّكَ أَوْحَىٰ لَهَا"
+        ],
+        correctIndex: 0,
+        explanation: "قال تعالى: ﴿إِذَا زُلْزِلَتِ ٱلْأَرْضُ زِلْزَالَهَا ۝ وَأَخْرَجَتِ ٱلْأَرْضُ أَثْقَالَهَا﴾."
+    },
+    {
+        scope: "juz_amma",
+        type: "next_ayah",
+        promptAyah: "أَلْهَىٰكُمُ ٱلتَّكَاثُرُ",
+        sourceInfo: "سورة التكاثر • الآية ١",
+        questionText: "ما هي الآية الكريمة التي تليها مباشرة؟",
+        options: [
+            "حَتَّىٰ زُرْتُمُ ٱلْمَقَابِرَ",
+            "كَلَّا سَوْفَ تَعْلَمُونَ",
+            "ثُمَّ كَلَّا سَوْفَ تَعْلَمُونَ",
+            "كَلَّا لَوْ تَعْلَمُونَ عِلْمَ ٱلْيَقِينِ"
+        ],
+        correctIndex: 0,
+        explanation: "قال تعالى في سورة التكاثر: ﴿أَلْهَىٰكُمُ ٱلتَّكَاثُرُ ۝ حَتَّىٰ زُرْتُمُ ٱلْمَقَابِرَ﴾."
+    },
+    {
+        scope: "juz_amma",
+        type: "next_ayah",
+        promptAyah: "إِنَّآ أَعْطَيْنَٰكَ ٱلْكَوْثَرَ",
+        sourceInfo: "سورة الكوثر • الآية ١",
+        questionText: "أكمل الآية المباركة التالية:",
+        options: [
+            "فَصَلِّ لِرَبِّكَ وَٱنْحَرْ",
+            "إِنَّ شَانِئَكَ هُوَ ٱلْأَبْتَرُ",
+            "قُلْ يَٰٓأَيُّهَا ٱلْكَٰفِرُونَ",
+            "إِذَا جَآءَ نَصْرُ ٱللَّهِ وَٱلْفَتْحُ"
+        ],
+        correctIndex: 0,
+        explanation: "قال تعالى في سورة الكوثر: ﴿إِنَّآ أَعْطَيْنَٰكَ ٱلْكَوْثَرَ ۝ فَصَلِّ لِرَبِّكَ وَٱنْحَرْ﴾."
+    },
+
+    // --- سورة الكهف ---
+    {
+        scope: "surah_kahf",
+        type: "next_ayah",
+        promptAyah: "ٱلْحَمْدُ لِلَّهِ ٱلَّذِىٓ أَنزَلَ عَلَىٰ عَبْدِهِ ٱلْكِتَٰبَ وَلَمْ يَجْعَل لَّهُۥ عِوَجَاۜ",
+        sourceInfo: "سورة الكهف • الآية ١",
+        questionText: "ما هي الآية المباركة التي تليها مباشرة؟",
+        options: [
+            "قَيِّمًۭا لِّيُنذِرَ بَأْسًۭا شَدِيدًۭا مِّن لَّدُنْهُ وَيُبَشِّرَ ٱلْمُؤْمِنِينَ",
+            "مَّٰكِثِينَ فِيهِ أَبَدًۭا",
+            "وَيُنذِرَ ٱلَّذِينَ قَالُوا۟ ٱتَّخَذَ ٱللَّهُ وَلَدًۭا",
+            "فَلَعَلَّكَ بَٰخِعٌۭ نَّفْسَكَ عَلَىٰٓ ءَاثَٰرِهِمْ"
+        ],
+        correctIndex: 0,
+        explanation: "قال تعالى في مطلع الكهف: ﴿وَلَمْ يَجْعَل لَّهُۥ عِوَجَاۜ ۝ قَيِّمًۭا لِّيُنذِرَ بَأْسًۭا شَدِيدًۭا مِّن لَّدُنْهُ﴾."
+    },
+    {
+        scope: "surah_kahf",
+        type: "next_ayah",
+        promptAyah: "إِذْ أَوَى ٱلْفِتْيَةُ إِلَى ٱلْكَهْفِ فَقَالُوا۟ رَبَّنَآ ءَاتِنَا مِن لَّدُنكَ رَحْمَةًۭ",
+        sourceInfo: "سورة الكهف • الآية ١٠",
+        questionText: "أكمل قوله تعالى: «... فَقَالُوا۟ رَبَّنَآ ءَاتِنَا مِن لَّدُنكَ رَحْمَةًۭ وَهَيِّئْ لَنَا مِنْ أَمْرِنَا...»",
+        options: [
+            "رَشَدًۭا",
+            "يُسْرًۭا",
+            "عِوَجًۭا",
+            "فَرَجًۭا"
+        ],
+        correctIndex: 0,
+        explanation: "قال تعالى: ﴿فَقَالُوا۟ رَبَّنَآ ءَاتِنَا مِن لَّدُنكَ رَحْمَةًۭ وَهَيِّئْ لَنَا مِنْ أَمْرِنَا رَشَدًۭا﴾."
+    },
+    {
+        scope: "surah_kahf",
+        type: "next_ayah",
+        promptAyah: "وَٱضْرِبْ لَهُم مَّثَلَ ٱلْحَيَوٰةِ ٱلدُّنْيَا كَمَآءٍ أَنزَلْنَٰهُ مِنَ ٱلسَّمَآءِ فَٱخْتَلَطَ بِهِۦ نَبَاتُ ٱلْأَرْضِ فَأَصْبَحَ هَشِيمًۭا تَذْرُوهُ ٱلرِّيَٰحُ ۗ",
+        sourceInfo: "سورة الكهف • الآية ٤٥",
+        questionText: "ما الآية الجليلة التي تليها مباشرة؟",
+        options: [
+            "ٱلْمَالُ وَٱلْبَنُونَ زِينَةُ ٱلْحَيَوٰةِ ٱلدُّنْيَا ۖ وَٱلْبَٰقِيَٰتُ ٱلصَّٰلِحَٰتُ خَيْرٌ عِندَ رَبِّكَ ثَوَابًۭا وَخَيْرٌ أَمَلًۭا",
+            "وَيَوْمَ نُسَيِّرُ ٱلْجِبَالَ وَتَرَى ٱلْأَرْضَ بَارِزَةً",
+            "وَوُضِعَ ٱلْكِتَٰبُ فَتَرَى ٱلْمُجْرِمِينَ مُشْفِقِينَ",
+            "وَإِذْ قُلْنَا لِلْمَلَٰٓئِكَةِ ٱسْجُدُوا۟ لِءَادَمَ"
+        ],
+        correctIndex: 0,
+        explanation: "قال تعالى: ﴿ٱلْمَالُ وَٱلْبَنُونَ زِينَةُ ٱلْحَيَوٰةِ ٱلدُّنْيَا...﴾ الآية ٤٦ من سورة الكهف."
+    },
+    {
+        scope: "surah_kahf",
+        type: "surah_name",
+        promptAyah: "قُلْ هَلْ نُنَبِّئُكُم بِٱلْأَخْسَرِينَ أَعْمَٰلًا ۝ ٱلَّذِينَ ضَلَّ سَعْيُهُمْ فِى ٱلْحَيَوٰةِ ٱلدُّنْيَا",
+        sourceInfo: "القرآن الكريم",
+        questionText: "في أي سورة وردت هاتان الآيتان المباركتان؟",
+        options: [
+            "سورة الكهف (أواخر السورة)",
+            "سورة الإسراء",
+            "سورة مريم",
+            "سورة الأنبياء"
+        ],
+        correctIndex: 0,
+        explanation: "وردتا في أواخر سورة الكهف المباركة (الآيتان ١٠٣-١٠٤)."
+    },
+
+    // --- سورة يس ---
+    {
+        scope: "surah_yasin",
+        type: "next_ayah",
+        promptAyah: "يسٓ ۝ وَٱلْقُرْءَانِ ٱلْحَكِيمِ",
+        sourceInfo: "سورة يس • الآيتان ١-٢",
+        questionText: "ما هي الآية الكريمة التالية؟",
+        options: [
+            "إِنَّكَ لَمِنَ ٱلْمُرْسَلِينَ",
+            "عَلَىٰ صِرَٰطٍۢ مُّسْتَقِيمٍۢ",
+            "تَنزِيلَ ٱلْعَزِيزِ ٱلرَّحِيمِ",
+            "لِتُنذِرَ قَوْمًۭا مَّآ أُنذِرَ ءَابَآؤُهُمْ"
+        ],
+        correctIndex: 0,
+        explanation: "قال تعالى: ﴿يسٓ ۝ وَٱلْقُرْءَانِ ٱلْحَكِيمِ ۝ إِنَّكَ لَمِنَ ٱلْمُرْسَلِينَ﴾."
+    },
+    {
+        scope: "surah_yasin",
+        type: "next_ayah",
+        promptAyah: "وَجَآءَ مِنْ أَقْصَا ٱلْمَدِينَةِ رَجُلٌۭ يَسْعَىٰ قَالَ يَٰقَوْمِ ٱتَّبِعُوا۟ ٱلْمُرْسَلِينَ",
+        sourceInfo: "سورة يس • الآية ٢٠",
+        questionText: "ما هي الآية التي تليها مباشرة؟",
+        options: [
+            "ٱتَّبِعُوا۟ مَن لَّا يَسْـَٔلُكُمْ أَجْرًۭا وَهُم مُّهْتَدُونَ",
+            "وَمَا لِىَ لَآ أَعْبُدُ ٱلَّذِى فَطَرَنِى",
+            "ءَأَتَّخِذُ مِن دُونِهِۦٓ ءَالِهَةً",
+            "إِنِّىٓ إِذًۭا لَّفِى ضَلَٰلٍۢ مُّبِينٍ"
+        ],
+        correctIndex: 0,
+        explanation: "قال تعالى في سورة يس: ﴿ٱتَّبِعُوا۟ مَن لَّا يَسْـَٔلُكُمْ أَجْرًۭا وَهُم مُّهْتَدُونَ﴾."
+    },
+    {
+        scope: "surah_yasin",
+        type: "next_ayah",
+        promptAyah: "إِنَّمَآ أَمْرُهُۥٓ إِذَآ أَرَادَ شَيْـًٔا أَن يَقُولَ لَهُۥ كُن فَيَكُونُ",
+        sourceInfo: "سورة يس • الآية ٨٢",
+        questionText: "ما ختام سورة يس بعد هذه الآية مباشرة؟",
+        options: [
+            "فَسُبْحَٰنَ ٱلَّذِى بِيَدِهِۦ مَلَكُوتُ كُلِّ شَىْءٍۢ وَإِلَيْهِ تُرْجَعُونَ",
+            "وَسَلَٰمٌ عَلَى ٱلْمُرْسَلِينَ",
+            "وَٱلْحَمْدُ لِلَّهِ رَبِّ ٱلْعَٰلَمِينَ",
+            "إِنَّ ٱللَّهَ عَلَىٰ كُلِّ شَىْءٍۢ قَدِيرٌ"
+        ],
+        correctIndex: 0,
+        explanation: "قال تعالى ختاماً لسورة يس: ﴿فَسُبْحَٰنَ ٱلَّذِى بِيَدِهِۦ مَلَكُوتُ كُلِّ شَىْءٍۢ وَإِلَيْهِ تُرْجَعُونَ﴾."
+    },
+
+    // --- سورة الملك ---
+    {
+        scope: "surah_mulk",
+        type: "next_ayah",
+        promptAyah: "تَبَٰرَكَ ٱلَّذِى بِيَدِهِ ٱلْمُلْكُ وَهُوَ عَلَىٰ كُلِّ شَىْءٍۢ قَدِيرٌ",
+        sourceInfo: "سورة الملك • الآية ١",
+        questionText: "ما هي الآية المباركة التالية مباشرة؟",
+        options: [
+            "ٱلَّذِى خَلَقَ ٱلْمَوْتَ وَٱلْحَيَوٰةَ لِيَبْلُوَكُمْ أَيُّكُمْ أَحْسَنُ عَمَلًۭا ۚ وَهُوَ ٱلْعَزِيزُ ٱلْغَفُورُ",
+            "ٱلَّذِى خَلَقَ سَبْعَ سَمَٰوَٰتٍۢ طِبَاقًۭا",
+            "مَّا تَرَىٰ فِى خَلْقِ ٱلرَّحْمَٰنِ مِن تَفَٰوُتٍۢ",
+            "وَلَقَدْ زَيَّنَّا ٱلسَّمَآءَ ٱلدُّنْيَا بِمَصَٰبِيحَ"
+        ],
+        correctIndex: 0,
+        explanation: "قال تعالى في سورة الملك: ﴿تَبَٰرَكَ ٱلَّذِى بِيَدِهِ ٱلْمُلْكُ... ۝ ٱلَّذِى خَلَقَ ٱلْمَوْتَ وَٱلْحَيَوٰةَ لِيَبْلُوَكُمْ أَيُّكُمْ أَحْسَنُ عَمَلًۭا﴾."
+    },
+    {
+        scope: "surah_mulk",
+        type: "next_ayah",
+        promptAyah: "إِنَّ ٱلَّذِينَ يَخْشَوْنَ رَبَّهُم بِٱلْغَيْبِ لَهُم مَّغْفِرَةٌۭ وَأَجْرٌۭ كَبِيرٌۭ",
+        sourceInfo: "سورة الملك • الآية ١٢",
+        questionText: "ما الآية الكريمة التي تليها مباشرة؟",
+        options: [
+            "وَأَسِرُّوا۟ قَوْلَكُمْ أَوِ ٱجْهَرُوا۟ بِهِۦٓ ۖ إِنَّهُۥ عَلِيمٌۢ بِذَاتِ ٱلصُّدُورِ",
+            "أَلَا يَعْلَمُ مَنْ خَلَقَ وَهُوَ ٱللَّطِيفُ ٱلْخَبِيرُ",
+            "هُوَ ٱلَّذِى جَعَلَ لَكُمُ ٱلْأَرْضَ ذَلُولًۭا",
+            "ءَأَمِنتُم مَّن فِى ٱلسَّمَآءِ أَن يَخْسِفَ بِكُمُ ٱلْأَرْضَ"
+        ],
+        correctIndex: 0,
+        explanation: "قال تعالى: ﴿وَأَسِرُّوا۟ قَوْلَكُمْ أَوِ ٱجْهَرُوا۟ بِهِۦٓ ۖ إِنَّهُۥ عَلِيمٌۢ بِذَاتِ ٱلصُّدُورِ﴾ في سورة الملك."
+    },
+    {
+        scope: "surah_mulk",
+        type: "next_ayah",
+        promptAyah: "قُلْ أَرَءَيْتُمْ إِنْ أَصْبَحَ مَآؤُكُمْ غَوْرًۭا",
+        sourceInfo: "سورة الملك • الآية ٣٠ (خاتمة السورة)",
+        questionText: "أكمل ختام الآية الكريمة: «... فَمَن يَأْتِيكُم بِمَآءٍۢ...»",
+        options: [
+            "مَّعِينٍۢ",
+            "فُرَاتٍ",
+            "طَهُورٍ",
+            "ثَجَّاجٍ"
+        ],
+        correctIndex: 0,
+        explanation: "قال تعالى ختاماً لسورة الملك: ﴿قُلْ أَرَءَيْتُمْ إِنْ أَصْبَحَ مَآؤُكُمْ غَوْرًۭا فَمَن يَأْتِيكُم بِمَآءٍۢ مَّعِينٍۭ﴾."
+    },
+
+    // --- سورة الواقعة ---
+    {
+        scope: "surah_waqiah",
+        type: "next_ayah",
+        promptAyah: "إِذَا وَقَعَتِ ٱلْوَاقِعَةُ",
+        sourceInfo: "سورة الواقعة • الآية ١",
+        questionText: "ما هي الآية المباركة التالية؟",
+        options: [
+            "لَيْسَ لِوَقْعَتِهَا كَاذِبَةٌ",
+            "خَافِضَةٌۭ رَّافِعَةٌ",
+            "إِذَا رُجَّتِ ٱلْأَرْضُ رَجًّۭا",
+            "وَبُسَّتِ ٱلْجِبَالُ بَسًّۭا"
+        ],
+        correctIndex: 0,
+        explanation: "قال تعالى: ﴿إِذَا وَقَعَتِ ٱلْوَاقِعَةُ ۝ لَيْسَ لِوَقْعَتِهَا كَاذِبَةٌ﴾."
+    },
+    {
+        scope: "surah_waqiah",
+        type: "next_ayah",
+        promptAyah: "وَٱلسَّٰبِقُونَ ٱلسَّٰبِقُونَ",
+        sourceInfo: "سورة الواقعة • الآية ١٠",
+        questionText: "ما الآية الكريمة التي تليها مباشرة؟",
+        options: [
+            "أُو۟لَٰٓئِكَ ٱلْمُقَرَّبُونَ",
+            "فِى جَنَّٰتِ ٱلنَّعِيمِ",
+            "ثُلَّةٌۭ مِّنَ ٱلْأَوَّلِينَ",
+            "وَقَلِيلٌۭ مِّنَ ٱلْءَاخِرِينَ"
+        ],
+        correctIndex: 0,
+        explanation: "قال تعالى: ﴿وَٱلسَّٰبِقُونَ ٱلسَّٰبِقُونَ ۝ أُو۟لَٰٓئِكَ ٱلْمُقَرَّبُونَ﴾."
+    },
+
+    // --- سورة الرحمن ---
+    {
+        scope: "surah_rahman",
+        type: "next_ayah",
+        promptAyah: "ٱلرَّحْمَٰنُ ۝ عَلَّمَ ٱلْقُرْءَانَ",
+        sourceInfo: "سورة الرحمن • الآيتان ١-٢",
+        questionText: "ما الآية التي تلي هاتين الآيتين مباشرة؟",
+        options: [
+            "خَلَقَ ٱلْإِنسَٰنَ",
+            "عَلَّمَهُ ٱلْبَيَانَ",
+            "ٱلشَّمْسُ وَٱلْقَمَرُ بِحُسْبَانٍۢ",
+            "وَٱلنَّجْمُ وَٱلشَّجَرُ يَسْجُدَانِ"
+        ],
+        correctIndex: 0,
+        explanation: "قال تعالى في مطلع الرحمن: ﴿ٱلرَّحْمَٰنُ ۝ عَلَّمَ ٱلْقُرْءَانَ ۝ خَلَقَ ٱلْإِنسَٰنَ ۝ عَلَّمَهُ ٱلْبَيَانَ﴾."
+    },
+    {
+        scope: "surah_rahman",
+        type: "next_ayah",
+        promptAyah: "كُلُّ مَنْ عَلَيْهَا فَانٍۢ",
+        sourceInfo: "سورة الرحمن • الآية ٢٦",
+        questionText: "ما الآية العظيمة التي تليها مباشرة؟",
+        options: [
+            "وَيَبْقَىٰ وَجْهُ رَبِّكَ ذُو ٱلْجَلَٰلِ وَٱلْإِكْرَامِ",
+            "فَبِأَىِّ ءَالَآءِ رَبِّكُمَا تُكَذِّبَانِ",
+            "يَسْـَٔلُهُۥ مَن فِى ٱلسَّمَٰوَٰتِ وَٱلْأَرْضِ",
+            "سَنَفْرُغُ لَكُمْ أَيُّهَ ٱلثَّقَلَانِ"
+        ],
+        correctIndex: 0,
+        explanation: "قال تعالى: ﴿كُلُّ مَنْ عَلَيْهَا فَانٍۢ ۝ وَيَبْقَىٰ وَجْهُ رَبِّكَ ذُو ٱلْجَلَٰلِ وَٱلْإِكْرَامِ﴾ في سورة الرحمن."
+    },
+
+    // --- جزء تبارك ---
+    {
+        scope: "juz_tabarak",
+        type: "next_ayah",
+        promptAyah: "نٓ ۚ وَٱلْقَلَمِ وَمَا يَسْطُرُونَ",
+        sourceInfo: "سورة القلم • الآية ١",
+        questionText: "ما هي الآية المباركة التالية؟",
+        options: [
+            "مَآ أَنتَ بِنِعْمَةِ رَبِّكَ بِمَجْنُونٍۢ",
+            "وَإِنَّ لَكَ لَأَجْرًا غَيْرَ مَمْنُونٍۢ",
+            "وَإِنَّكَ لَعَلَىٰ خُلُقٍ عَظِيمٍۢ",
+            "فَسَتُبْصِرُ وَيُبْصِرُونَ"
+        ],
+        correctIndex: 0,
+        explanation: "قال تعالى: ﴿نٓ ۚ وَٱلْقَلَمِ وَمَا يَسْطُرُونَ ۝ مَآ أَنتَ بِنِعْمَةِ رَبِّكَ بِمَجْنُونٍۢ﴾."
+    },
+    {
+        scope: "juz_tabarak",
+        type: "surah_name",
+        promptAyah: "ٱلْحَآقَّةُ ۝ مَا ٱلْحَآقَّةُ ۝ وَمَآ أَدْرَىٰكَ مَا ٱلْحَآقَّةُ",
+        sourceInfo: "القرآن الكريم",
+        questionText: "في أي سورة وردت هذه الآيات الكريمة؟",
+        options: [
+            "سورة الحاقة",
+            "سورة المعارج",
+            "سورة القيامة",
+            "سورة القارعة"
+        ],
+        correctIndex: 0,
+        explanation: "مطلع سورة الحاقة المباركة في جزء تبارك."
+    },
+    {
+        scope: "juz_tabarak",
+        type: "next_ayah",
+        promptAyah: "يَٰٓأَيُّهَا ٱلْمُزَّمِّلُ",
+        sourceInfo: "سورة المزمل • الآية ١",
+        questionText: "أكمل الآية الكريمة التالية مباشرة:",
+        options: [
+            "قُمِ ٱلَّيْلَ إِلَّا قَلِيلًۭا",
+            "نِّصْفَهُۥٓ أَوِ ٱنقُصْ مِنْهُ قَلِيلًا",
+            "أَوْ زِدْ عَلَيْهِ وَرَتِّلِ ٱلْقُرْءَانَ تَرْتِيلًا",
+            "إِنَّا سَنُلْقِى عَلَيْكَ قَوْلًۭا ثَقِيلًا"
+        ],
+        correctIndex: 0,
+        explanation: "قال تعالى: ﴿يَٰٓأَيُّهَا ٱلْمُزَّمِّلُ ۝ قُمِ ٱلَّيْلَ إِلَّا قَلِيلًۭا﴾."
+    },
+    {
+        scope: "juz_tabarak",
+        type: "next_ayah",
+        promptAyah: "يَٰٓأَيُّهَا ٱلْمُدَّثِّرُ",
+        sourceInfo: "سورة المدثر • الآية ١",
+        questionText: "ما الآية الكريمة التالية مباشرة؟",
+        options: [
+            "قُمْ فَأَنذِرْ",
+            "وَرَبَّكَ فَكَبِّرْ",
+            "وَثِيَابَكَ فَطَهِّرْ",
+            "وَٱلرُّجْزَ فَٱهْجُرْ"
+        ],
+        correctIndex: 0,
+        explanation: "قال تعالى: ﴿يَٰٓأَيُّهَا ٱلْمُدَّثِّرُ ۝ قُمْ فَأَنذِرْ﴾."
+    },
+
+    // --- فاتحة الكتاب وأوائل البقرة ---
+    {
+        scope: "surah_fatiha_baqarah_intro",
+        type: "next_ayah",
+        promptAyah: "إِيَّاكَ نَعْبُدُ وَإِيَّاكَ نَسْتَعِينُ",
+        sourceInfo: "سورة الفاتحة • الآية ٥",
+        questionText: "ما هي الآية الكريمة التي تليها مباشرة؟",
+        options: [
+            "ٱهْدِنَا ٱلصِّرَٰطَ ٱلْمُسْتَقِيمَ",
+            "صِرَٰطَ ٱلَّذِينَ أَنْعَمْتَ عَلَيْهِمْ",
+            "مَٰلِكِ يَوْمِ ٱلدِّينِ",
+            "ٱلرَّحْمَٰنِ ٱلرَّحِيمِ"
+        ],
+        correctIndex: 0,
+        explanation: "قال تعالى في سورة الفاتحة: ﴿إِيَّاكَ نَعْبُدُ وَإِيَّاكَ نَسْتَعِينُ ۝ ٱهْدِنَا ٱلصِّرَٰطَ ٱلْمُسْتَقِيمَ﴾."
+    },
+    {
+        scope: "surah_fatiha_baqarah_intro",
+        type: "next_ayah",
+        promptAyah: "الٓمٓ ۝ ذَٰلِكَ ٱلْكِتَٰبُ لَا رَيْبَ ۛ فِيهِ ۛ هُدًۭى لِّلْمُتَّقِينَ",
+        sourceInfo: "سورة البقرة • الآيتان ١-٢",
+        questionText: "ما هي الآية المباركة التي تصف المتقين بعدها مباشرة؟",
+        options: [
+            "ٱلَّذِينَ يُؤْمِنُونَ بِٱلْغَيْبِ وَيُقِيمُونَ ٱلصَّلَوٰةَ وَمِمَّا رَزَقْنَٰهُمْ يُنفِقُونَ",
+            "وَٱلَّذِينَ يُؤْمِنُونَ بِمَآ أُنزِلَ إِلَيْكَ وَمَآ أُنزِلَ مِن قَبْلِكَ",
+            "أُو۟لَٰٓئِكَ عَلَىٰ هُدًۭى مِّن رَّبِّهِمْ ۖ وَأُو۟لَٰٓئِكَ هُمُ ٱلْمُفْلِحُونَ",
+            "إِنَّ ٱلَّذِينَ كَفَرُوا۟ سَوَآءٌ عَلَيْهِمْ"
+        ],
+        correctIndex: 0,
+        explanation: "قال تعالى: ﴿ٱلَّذِينَ يُؤْمِنُونَ بِٱلْغَيْبِ وَيُقِيمُونَ ٱلصَّلَوٰةَ وَمِمَّا رَزَقْنَٰهُمْ يُنفِقُونَ﴾ (البقرة: ٣)."
+    }
+];
+
+/**
+ * محرك المقرأة القرآنية الكامل (المصحف المعلم + الاختبارات + التكرار + التسميع الذاتي)
+ */
+function initMaqraahEngine() {
+    const maqraahSection = document.getElementById('maqraahSection');
+    if (!maqraahSection) return;
+
+    // --- حالة مشغل القرآن ---
+    const quranState = {
+        currentSurah: 1,
+        currentReciter: 'ar.husary',
+        repeatCountTarget: 1,
+        currentAyahPlayRepeat: 0,
+        currentPlayingAyahIndex: -1,
+        ayahsData: [],
+        audioPlayer: null,
+        isPlaying: false,
+        isBlindMode: false,
+        fontSizeLevel: 2 // 0: صغير, 1: متوسط, 2: قياسي, 3: كبير, 4: كبير جداً
+    };
+
+    // خريطة كاش الذاكرة للسور المحملة لتقليل طلبات الشبكة
+    const surahCache = new Map();
+
+    // عناصر واجهة المصحف
+    const surahSelect = document.getElementById('quranSurahSelect');
+    const reciterSelect = document.getElementById('quranReciterSelect');
+    const repeatSelect = document.getElementById('quranRepeatSelect');
+    const blindToggleBtn = document.getElementById('blindReciteToggle');
+    const blindNotice = document.getElementById('blindModeNotice');
+    const playSurahBtn = document.getElementById('quranPlaySurahBtn');
+    const stopBtn = document.getElementById('quranStopBtn');
+    const zoomInBtn = document.getElementById('quranZoomInBtn');
+    const zoomOutBtn = document.getElementById('quranZoomOutBtn');
+    const versesContainer = document.getElementById('quranVersesContainer');
+
+    // عناصر شريط الهيدر الزخرفي للسورة
+    const surahTitleDisplay = document.getElementById('surahTitleDisplay');
+    const surahMetaType = document.getElementById('surahMetaType');
+    const surahSubtitleInfo = document.getElementById('surahSubtitleInfo');
+    const surahBasmalaBanner = document.getElementById('surahBasmalaBanner');
+
+    // عناصر شريط الصوت العائم
+    const floatingAudioBar = document.getElementById('quranFloatingAudioBar');
+    const audioCurrentAyahBadge = document.getElementById('audioCurrentAyahBadge');
+    const audioCurrentReciter = document.getElementById('audioCurrentReciter');
+    const audioRepeatBadge = document.getElementById('audioRepeatBadge');
+    const audioPrevBtn = document.getElementById('audioPrevAyahBtn');
+    const audioPlayPauseBtn = document.getElementById('audioTogglePlayBtn');
+    const audioNextBtn = document.getElementById('audioNextAyahBtn');
+    const audioCloseBtn = document.getElementById('audioCloseBtn');
+
+    // أسماء القراء بالعربية
+    const reciterDisplayNames = {
+        'ar.husary': 'الشيخ الحصري (المعلم)',
+        'ar.minshawi': 'الشيخ المنشاوي (مرتل)',
+        'ar.abdulbasitmurattal': 'الشيخ عبد الباسط (مرتل)',
+        'ar.alafasy': 'الشيخ مشاري العفاسي'
+    };
+
+    // مجلدات الصوت المباشر من EveryAyah
+    const reciterAudioFolders = {
+        'ar.husary': 'Husary_128kbps',
+        'ar.minshawi': 'Minshawy_Murattal_128kbps',
+        'ar.abdulbasitmurattal': 'Abdul_Basit_Murattal_192kbps',
+        'ar.alafasy': 'Alafasy_128kbps'
+    };
+
+    // أحجام الخط
+    const fontSizes = ['1.25rem', '1.45rem', '1.65rem', '1.9rem', '2.2rem'];
+
+    // -------------------------------------------------------------
+    // أ. إدارة التبويبات الثلاثة (المصحف - الاختبارات - الحلقات)
+    // -------------------------------------------------------------
+    const tabButtons = document.querySelectorAll('.maqraah-tab-btn');
+    const tabPanes = {
+        reader: document.getElementById('maqraahTabReader'),
+        quiz: document.getElementById('maqraahTabQuiz'),
+        circles: document.getElementById('maqraahTabCircles')
+    };
+
+    function switchMaqraahTab(targetTab) {
+        tabButtons.forEach(btn => {
+            const isMatch = btn.getAttribute('data-tab') === targetTab;
+            btn.classList.toggle('active', isMatch);
+            btn.setAttribute('aria-selected', isMatch ? 'true' : 'false');
+        });
+
+        Object.keys(tabPanes).forEach(tabKey => {
+            const pane = tabPanes[tabKey];
+            if (pane) {
+                if (tabKey === targetTab) {
+                    pane.style.display = 'block';
+                    pane.classList.add('active');
+                } else {
+                    pane.style.display = 'none';
+                    pane.classList.remove('active');
+                }
+            }
+        });
+    }
+
+    tabButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const target = btn.getAttribute('data-tab');
+            if (target) switchMaqraahTab(target);
+        });
+    });
+
+    const backToReaderBtn = document.getElementById('backToQuranReaderBtn');
+    if (backToReaderBtn) {
+        backToReaderBtn.addEventListener('click', () => {
+            switchMaqraahTab('reader');
+            maqraahSection.scrollIntoView({ behavior: 'smooth' });
+        });
+    }
+
+    // -------------------------------------------------------------
+    // ب. ملء قائمة السور الـ ١١٤
+    // -------------------------------------------------------------
+    if (surahSelect) {
+        surahSelect.innerHTML = QURAN_SURAHS.map(s => {
+            return `<option value="${s.number}">${s.number}. سورة ${s.name} (${s.ayahs} آية - ${s.type})</option>`;
+        }).join('');
+
+        surahSelect.addEventListener('change', (e) => {
+            const num = parseInt(e.target.value, 10) || 1;
+            loadSurah(num);
+        });
+    }
+
+    if (reciterSelect) {
+        reciterSelect.addEventListener('change', (e) => {
+            quranState.currentReciter = e.target.value;
+            if (audioCurrentReciter) {
+                audioCurrentReciter.textContent = reciterDisplayNames[quranState.currentReciter] || 'القارئ';
+            }
+            if (quranState.isPlaying && quranState.currentPlayingAyahIndex >= 0) {
+                playAyahByIndex(quranState.currentPlayingAyahIndex);
+            }
+        });
+    }
+
+    if (repeatSelect) {
+        repeatSelect.addEventListener('change', (e) => {
+            quranState.repeatCountTarget = parseInt(e.target.value, 10) || 1;
+            quranState.currentAyahPlayRepeat = 0;
+            updateRepeatBadgeUI();
+        });
+    }
+
+    // -------------------------------------------------------------
+    // ج. التحكم في وضع التسميع الذاتي (Blind Mode)
+    // -------------------------------------------------------------
+    function toggleBlindMode() {
+        quranState.isBlindMode = !quranState.isBlindMode;
+        if (versesContainer) {
+            versesContainer.classList.toggle('blind-mode-active', quranState.isBlindMode);
+        }
+        if (blindNotice) {
+            blindNotice.style.display = quranState.isBlindMode ? 'flex' : 'none';
+        }
+        if (blindToggleBtn) {
+            blindToggleBtn.classList.toggle('active', quranState.isBlindMode);
+            blindToggleBtn.setAttribute('aria-pressed', quranState.isBlindMode ? 'true' : 'false');
+        }
+
+        // إزالة حالة الكشف عن الآيات عند تفعيل الوضع من جديد
+        if (quranState.isBlindMode) {
+            document.querySelectorAll('.quran-ayah.revealed').forEach(el => el.classList.remove('revealed'));
+            showToast('تم تفعيل وضع التسميع الذاتي 🌿 اقرأ غيباً والمس الآية لكشفها عند الحاجة.', 'info');
+        } else {
+            showToast('تم إيقاف وضع التسميع والعودة للقراءة العادية 📖');
+        }
+    }
+
+    if (blindToggleBtn) {
+        blindToggleBtn.addEventListener('click', toggleBlindMode);
+    }
+
+    // -------------------------------------------------------------
+    // د. التحكم في حجم خط المصحف
+    // -------------------------------------------------------------
+    function applyFontSize() {
+        if (versesContainer) {
+            versesContainer.style.setProperty('--quran-font-size', fontSizes[quranState.fontSizeLevel]);
+        }
+    }
+
+    if (zoomInBtn) {
+        zoomInBtn.addEventListener('click', () => {
+            if (quranState.fontSizeLevel < fontSizes.length - 1) {
+                quranState.fontSizeLevel++;
+                applyFontSize();
+            }
+        });
+    }
+
+    if (zoomOutBtn) {
+        zoomOutBtn.addEventListener('click', () => {
+            if (quranState.fontSizeLevel > 0) {
+                quranState.fontSizeLevel--;
+                applyFontSize();
+            }
+        });
+    }
+
+    // -------------------------------------------------------------
+    // هـ. جلب وعرض آيات السورة الكريمة
+    // -------------------------------------------------------------
+    async function loadSurah(surahNumber) {
+        stopAudioPlayback();
+        quranState.currentSurah = surahNumber;
+        quranState.currentPlayingAyahIndex = -1;
+        quranState.currentAyahPlayRepeat = 0;
+
+        const surahMeta = QURAN_SURAHS.find(s => s.number === surahNumber) || QURAN_SURAHS[0];
+
+        // تحديث الهيدر
+        if (surahTitleDisplay) surahTitleDisplay.textContent = `سُورَةُ ${surahMeta.name}`;
+        if (surahMetaType) surahMetaType.textContent = `${surahMeta.type} • ${surahMeta.ayahs} آيات`;
+        if (surahSubtitleInfo) {
+            surahSubtitleInfo.textContent = `ترتيبها بالمصحف الشريف: ${surahMeta.number} • التلاوة برواية حفص عن عاصم`;
+        }
+
+        // إظهار/إخفاء البسملة (سورة التوبة رقم 9 لا تبدأ بالبسملة، وسورة الفاتحة رقم 1 البسملة هي الآية 1)
+        if (surahBasmalaBanner) {
+            if (surahNumber === 9 || surahNumber === 1) {
+                surahBasmalaBanner.style.display = 'none';
+            } else {
+                surahBasmalaBanner.style.display = 'block';
+            }
+        }
+
+        // فحص الذاكرة المخبأة أولاً
+        if (surahCache.has(surahNumber)) {
+            renderVerses(surahCache.get(surahNumber));
+            return;
+        }
+
+        // فحص البيانات المضمنة محلياً للطوارئ أو الأوفلاين
+        if (OFFLINE_SURAHS_DATA[surahNumber]) {
+            const data = OFFLINE_SURAHS_DATA[surahNumber];
+            surahCache.set(surahNumber, data);
+            renderVerses(data);
+            return;
+        }
+
+        // عرض مؤشر التحميل
+        if (versesContainer) {
+            versesContainer.innerHTML = `
+                <div class="quran-loading-state">
+                    <i class="fa-solid fa-circle-notch fa-spin gold-icon"></i>
+                    <span>جاري تحميل آيات سورة ${surahMeta.name} المباركة...</span>
+                </div>
+            `;
+        }
+
+        try {
+            // جلب النص العثماني المعتمد من Quran Cloud API
+            const res = await fetch(`https://api.alquran.cloud/v1/surah/${surahNumber}/editions/quran-uthmani`);
+            if (res.ok) {
+                const json = await res.json();
+                if (json.data && json.data[0] && Array.isArray(json.data[0].ayahs)) {
+                    let ayahs = json.data[0].ayahs.map(a => ({
+                        numberInSurah: a.numberInSurah,
+                        text: a.text
+                    }));
+
+                    // في كل السور ما عدا الفاتحة والتوبة، السطر الأول من الـ API قد يتضمن البسملة مدموجة في أول آية
+                    if (surahNumber !== 1 && surahNumber !== 9 && ayahs.length > 0) {
+                        const bismillahUthmani = "بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ ";
+                        if (ayahs[0].text.startsWith(bismillahUthmani)) {
+                            ayahs[0].text = ayahs[0].text.substring(bismillahUthmani.length).trim();
+                        }
+                    }
+
+                    surahCache.set(surahNumber, ayahs);
+                    renderVerses(ayahs);
+                    return;
+                }
+            }
+            throw new Error('API request failed');
+        } catch (err) {
+            console.warn('Quran API fetch error, fallback to offline generator:', err);
+            // في حال عدم توفر اتصال بالإنترنت، إنشاء عرض بديل محلي
+            const fallbackAyahs = generateOfflineFallback(surahMeta);
+            surahCache.set(surahNumber, fallbackAyahs);
+            renderVerses(fallbackAyahs);
+        }
+    }
+
+    function generateOfflineFallback(surahMeta) {
+        const list = [];
+        for (let i = 1; i <= surahMeta.ayahs; i++) {
+            list.push({
+                numberInSurah: i,
+                text: `«آية مباركة ${i} من سورة ${surahMeta.name}»`
+            });
+        }
+        return list;
+    }
+
+    // أرقام عربية مشرقية لأقواس الآيات ﴿١﴾
+    function toArabicDigits(num) {
+        const arabicMap = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
+        return String(num).split('').map(d => arabicMap[d] || d).join('');
+    }
+
+    function renderVerses(ayahs) {
+        quranState.ayahsData = ayahs;
+        if (!versesContainer) return;
+
+        versesContainer.innerHTML = '';
+        const fragment = document.createDocumentFragment();
+
+        ayahs.forEach((ayah, index) => {
+            const span = document.createElement('span');
+            span.className = 'quran-ayah';
+            span.setAttribute('data-index', index);
+            span.setAttribute('data-ayah-num', ayah.numberInSurah);
+
+            const textSpan = document.createElement('span');
+            textSpan.className = 'ayah-text';
+            textSpan.textContent = ayah.text + ' ';
+
+            const numSymbol = document.createElement('span');
+            numSymbol.className = 'ayah-num-symbol';
+            numSymbol.title = `استمع للآية ${ayah.numberInSurah}`;
+            numSymbol.innerHTML = `﴿${toArabicDigits(ayah.numberInSurah)}﴾`;
+
+            span.appendChild(textSpan);
+            span.appendChild(numSymbol);
+
+            // عند النقر على الآية:
+            // في وضع التسميع: لمسة واحدة تكشف الآية
+            // في الوضع العادي أو عند النقر على رمز الآية: تشغيل التلاوة الصوتية
+            span.addEventListener('click', (e) => {
+                if (quranState.isBlindMode) {
+                    span.classList.toggle('revealed');
+                    // إذا نقر مباشرة على رمز الرقم، نشغل الصوت أيضاً
+                    if (e.target.closest('.ayah-num-symbol')) {
+                        playAyahByIndex(index);
+                    }
+                } else {
+                    playAyahByIndex(index);
+                }
+            });
+
+            fragment.appendChild(span);
+        });
+
+        versesContainer.appendChild(fragment);
+        applyFontSize();
+    }
+
+    // -------------------------------------------------------------
+    // و. نظام الصوتيات والتلاوة والتكرار
+    // -------------------------------------------------------------
+    function getAyahAudioUrl(reciterKey, surahNum, ayahNum) {
+        const folder = reciterAudioFolders[reciterKey] || 'Husary_128kbps';
+        const sStr = String(surahNum).padStart(3, '0');
+        const aStr = String(ayahNum).padStart(3, '0');
+        return `https://everyayah.com/data/${folder}/${sStr}${aStr}.mp3`;
+    }
+
+    function updateRepeatBadgeUI() {
+        if (!audioRepeatBadge) return;
+        if (quranState.repeatCountTarget > 1) {
+            audioRepeatBadge.style.display = 'inline-flex';
+            audioRepeatBadge.textContent = `تكرار: ${quranState.currentAyahPlayRepeat + 1}/${quranState.repeatCountTarget}`;
+        } else {
+            audioRepeatBadge.style.display = 'none';
+        }
+    }
+
+    function playAyahByIndex(index) {
+        if (!quranState.ayahsData || index < 0 || index >= quranState.ayahsData.length) {
+            stopAudioPlayback();
+            return;
+        }
+
+        quranState.currentPlayingAyahIndex = index;
+        const ayah = quranState.ayahsData[index];
+        const audioUrl = getAyahAudioUrl(quranState.currentReciter, quranState.currentSurah, ayah.numberInSurah);
+
+        // إنشاء أو إعادة استخدام مشغل الصوت
+        if (!quranState.audioPlayer) {
+            quranState.audioPlayer = new Audio();
+        }
+
+        quranState.audioPlayer.pause();
+        quranState.audioPlayer.src = audioUrl;
+
+        // إبراز الآية الحالية في النص
+        document.querySelectorAll('.quran-ayah.playing-ayah').forEach(el => el.classList.remove('playing-ayah'));
+        const currentAyahEl = document.querySelector(`.quran-ayah[data-index="${index}"]`);
+        if (currentAyahEl) {
+            currentAyahEl.classList.add('playing-ayah');
+            if (quranState.isBlindMode) {
+                currentAyahEl.classList.add('revealed'); // كشف الآية تلقائياً عند سماعها
+            }
+            currentAyahEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        // تحديث عناصر الشريط العائم
+        if (floatingAudioBar) floatingAudioBar.style.display = 'block';
+        if (audioCurrentAyahBadge) audioCurrentAyahBadge.textContent = `الآية ${ayah.numberInSurah}`;
+        if (audioCurrentReciter) {
+            audioCurrentReciter.textContent = reciterDisplayNames[quranState.currentReciter] || 'القارئ المعلم';
+        }
+        updateRepeatBadgeUI();
+
+        if (playSurahBtn) {
+            playSurahBtn.innerHTML = '<i class="fa-solid fa-pause"></i> <span>إيقاف مؤقت</span>';
+        }
+        if (stopBtn) stopBtn.style.display = 'inline-flex';
+        if (audioPlayPauseBtn) {
+            audioPlayPauseBtn.innerHTML = '<i class="fa-solid fa-pause"></i>';
+            audioPlayPauseBtn.title = 'إيقاف مؤقت';
+        }
+
+        quranState.audioPlayer.play().then(() => {
+            quranState.isPlaying = true;
+        }).catch(err => {
+            console.warn('Audio playback error:', err);
+            showToast('تعذر تشغيل الصوت للآية، تحقق من اتصال الإنترنت.', 'error');
+            quranState.isPlaying = false;
+        });
+
+        // حدث انتهاء قراءة الآية (التحكم في التكرار والانتقال للتالية)
+        quranState.audioPlayer.onended = () => {
+            quranState.currentAyahPlayRepeat++;
+            if (quranState.currentAyahPlayRepeat < quranState.repeatCountTarget) {
+                // تكرار نفس الآية
+                updateRepeatBadgeUI();
+                quranState.audioPlayer.currentTime = 0;
+                quranState.audioPlayer.play().catch(() => {});
+            } else {
+                // الانتقال للآية التالية
+                quranState.currentAyahPlayRepeat = 0;
+                updateRepeatBadgeUI();
+                if (index + 1 < quranState.ayahsData.length) {
+                    playAyahByIndex(index + 1);
+                } else {
+                    // ختام السورة المباركة
+                    showToast('تم بحمد الله الاستماع للسورة كاملة 🌿 تقبل الله منكم.');
+                    stopAudioPlayback();
+                }
+            }
+        };
+
+        quranState.audioPlayer.onerror = () => {
+            console.warn('Failed to load ayah audio');
+            showToast('تعذر جلب ملف الصوت للآية، يمكنك المتابعة بالقراءة.', 'error');
+        };
+    }
+
+    function togglePlaySurah() {
+        if (!quranState.audioPlayer || !quranState.audioPlayer.src || quranState.currentPlayingAyahIndex === -1) {
+            // بدء التشغيل من أول آية
+            playAyahByIndex(0);
+            return;
+        }
+
+        if (quranState.isPlaying) {
+            quranState.audioPlayer.pause();
+            quranState.isPlaying = false;
+            if (playSurahBtn) {
+                playSurahBtn.innerHTML = '<i class="fa-solid fa-play"></i> <span>متابعة التلاوة</span>';
+            }
+            if (audioPlayPauseBtn) {
+                audioPlayPauseBtn.innerHTML = '<i class="fa-solid fa-play"></i>';
+                audioPlayPauseBtn.title = 'تشغيل';
+            }
+        } else {
+            quranState.audioPlayer.play().then(() => {
+                quranState.isPlaying = true;
+                if (playSurahBtn) {
+                    playSurahBtn.innerHTML = '<i class="fa-solid fa-pause"></i> <span>إيقاف مؤقت</span>';
+                }
+                if (audioPlayPauseBtn) {
+                    audioPlayPauseBtn.innerHTML = '<i class="fa-solid fa-pause"></i>';
+                    audioPlayPauseBtn.title = 'إيقاف مؤقت';
+                }
+            }).catch(() => {});
+        }
+    }
+
+    function stopAudioPlayback() {
+        if (quranState.audioPlayer) {
+            quranState.audioPlayer.pause();
+            quranState.audioPlayer.currentTime = 0;
+        }
+        quranState.isPlaying = false;
+        quranState.currentPlayingAyahIndex = -1;
+        quranState.currentAyahPlayRepeat = 0;
+
+        document.querySelectorAll('.quran-ayah.playing-ayah').forEach(el => el.classList.remove('playing-ayah'));
+
+        if (floatingAudioBar) floatingAudioBar.style.display = 'none';
+        if (stopBtn) stopBtn.style.display = 'none';
+        if (playSurahBtn) {
+            playSurahBtn.innerHTML = '<i class="fa-solid fa-play"></i> <span>تشغيل تلاوة السورة</span>';
+        }
+    }
+
+    if (playSurahBtn) playSurahBtn.addEventListener('click', togglePlaySurah);
+    if (stopBtn) stopBtn.addEventListener('click', stopAudioPlayback);
+    if (audioPlayPauseBtn) audioPlayPauseBtn.addEventListener('click', togglePlaySurah);
+    if (audioCloseBtn) audioCloseBtn.addEventListener('click', stopAudioPlayback);
+
+    if (audioNextBtn) {
+        audioNextBtn.addEventListener('click', () => {
+            if (quranState.currentPlayingAyahIndex + 1 < quranState.ayahsData.length) {
+                quranState.currentAyahPlayRepeat = 0;
+                playAyahByIndex(quranState.currentPlayingAyahIndex + 1);
+            }
+        });
+    }
+
+    if (audioPrevBtn) {
+        audioPrevBtn.addEventListener('click', () => {
+            if (quranState.currentPlayingAyahIndex > 0) {
+                quranState.currentAyahPlayRepeat = 0;
+                playAyahByIndex(quranState.currentPlayingAyahIndex - 1);
+            }
+        });
+    }
+
+    // -------------------------------------------------------------
+    // ز. محرك اختبارات التحفيظ والتسميع الذكية (Smart Hifz Quiz)
+    // -------------------------------------------------------------
+    const quizSetupScreen = document.getElementById('quizSetupScreen');
+    const quizActiveScreen = document.getElementById('quizActiveScreen');
+    const quizResultScreen = document.getElementById('quizResultScreen');
+    const startQuizBtn = document.getElementById('startQuizBtn');
+    const retryQuizBtn = document.getElementById('retryQuizBtn');
+    const shareQuizBtn = document.getElementById('shareQuizResultBtn');
+
+    const quizScopeSelect = document.getElementById('quizScopeSelect');
+    const quizLengthSelect = document.getElementById('quizLengthSelect');
+
+    const quizStepText = document.getElementById('quizStepText');
+    const quizLiveScore = document.getElementById('quizLiveScore');
+    const quizProgressBarFill = document.getElementById('quizProgressBarFill');
+    const quizTypePill = document.getElementById('quizTypePill');
+    const quizPromptText = document.getElementById('quizPromptText');
+    const quizAyahPrompt = document.getElementById('quizAyahPrompt');
+    const quizAyahSourceInfo = document.getElementById('quizAyahSourceInfo');
+    const quizAnswersList = document.getElementById('quizAnswersList');
+    const quizFeedbackBox = document.getElementById('quizFeedbackBox');
+    const quizNextActionWrap = document.getElementById('quizNextActionWrap');
+    const quizNextQuestionBtn = document.getElementById('quizNextQuestionBtn');
+
+    const resultBadgeIcon = document.getElementById('resultBadgeIcon');
+    const resultTitle = document.getElementById('resultTitle');
+    const resultScoreDisplay = document.getElementById('resultScoreDisplay');
+    const resultMessage = document.getElementById('resultMessage');
+
+    let currentQuizQuestions = [];
+    let currentQuizQuestionIndex = 0;
+    let quizScore = 0;
+    let quizTotalCount = 5;
+    let isQuestionAnswered = false;
+
+    function startHifzQuiz() {
+        const scope = quizScopeSelect ? quizScopeSelect.value : 'juz_amma';
+        quizTotalCount = parseInt(quizLengthSelect ? quizLengthSelect.value : '5', 10) || 5;
+
+        // تصفية بنك الأسئلة حسب النطاق المختار
+        let eligible = HIFZ_QUIZ_BANK.filter(q => q.scope === scope);
+
+        // إذا كان عدد الأسئلة بالنطاق أقل من المطلوب ندمج أسئلة جزء عم وجزء تبارك
+        if (eligible.length < quizTotalCount) {
+            eligible = [...eligible, ...HIFZ_QUIZ_BANK.filter(q => q.scope === 'juz_amma' && !eligible.includes(q))];
+        }
+
+        // خلط الأسئلة عشوائياً واختيار العدد المطلوب
+        const shuffled = [...eligible].sort(() => 0.5 - Math.random());
+        currentQuizQuestions = shuffled.slice(0, quizTotalCount);
+
+        currentQuizQuestionIndex = 0;
+        quizScore = 0;
+        isQuestionAnswered = false;
+
+        if (quizSetupScreen) quizSetupScreen.style.display = 'none';
+        if (quizResultScreen) quizResultScreen.style.display = 'none';
+        if (quizActiveScreen) quizActiveScreen.style.display = 'block';
+
+        renderQuizQuestion();
+    }
+
+    function renderQuizQuestion() {
+        if (currentQuizQuestionIndex >= currentQuizQuestions.length) {
+            showQuizResults();
+            return;
+        }
+
+        isQuestionAnswered = false;
+        const q = currentQuizQuestions[currentQuizQuestionIndex];
+
+        // تحديث المؤشرات
+        if (quizStepText) {
+            quizStepText.textContent = `السؤال ${toArabicDigits(currentQuizQuestionIndex + 1)} من ${toArabicDigits(quizTotalCount)}`;
+        }
+        if (quizLiveScore) {
+            quizLiveScore.textContent = `النقاط: ${toArabicDigits(quizScore)}`;
+        }
+        if (quizProgressBarFill) {
+            const pct = Math.round(((currentQuizQuestionIndex) / quizTotalCount) * 100);
+            quizProgressBarFill.style.width = `${pct}%`;
+        }
+
+        // نص السؤال والآية
+        if (quizTypePill) {
+            if (q.type === 'next_ayah') {
+                quizTypePill.innerHTML = '<i class="fa-solid fa-arrow-down-short-wide"></i> أكمل الآية المباركة التالية';
+            } else if (q.type === 'surah_name') {
+                quizTypePill.innerHTML = '<i class="fa-solid fa-book-open"></i> معرفة اسم السورة المباركة';
+            } else {
+                quizTypePill.innerHTML = '<i class="fa-solid fa-star-and-crescent"></i> إتقان المتشابهات والتسميع';
+            }
+        }
+
+        if (quizPromptText) quizPromptText.textContent = q.questionText;
+        if (quizAyahPrompt) quizAyahPrompt.textContent = `«${q.promptAyah}»`;
+        if (quizAyahSourceInfo) quizAyahSourceInfo.textContent = `[${q.sourceInfo}]`;
+
+        // إخفاء التغذية وزر التالي
+        if (quizFeedbackBox) {
+            quizFeedbackBox.style.display = 'none';
+            quizFeedbackBox.className = 'quiz-feedback-box';
+            quizFeedbackBox.innerHTML = '';
+        }
+        if (quizNextActionWrap) quizNextActionWrap.style.display = 'none';
+
+        // رسم أزرار الخيارات
+        if (quizAnswersList) {
+            quizAnswersList.innerHTML = '';
+            q.options.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'quiz-choice-btn';
+                btn.setAttribute('data-choice-idx', idx);
+
+                const letter = ['أ', 'ب', 'ج', 'د'][idx] || (idx + 1);
+                btn.innerHTML = `
+                    <span class="choice-letter">${letter}</span>
+                    <span class="choice-text">${escapeHtml(opt)}</span>
+                `;
+
+                btn.addEventListener('click', () => handleChoiceSelect(idx));
+                quizAnswersList.appendChild(btn);
+            });
+        }
+    }
+
+    function handleChoiceSelect(selectedIndex) {
+        if (isQuestionAnswered) return;
+        isQuestionAnswered = true;
+
+        const q = currentQuizQuestions[currentQuizQuestionIndex];
+        const isCorrect = selectedIndex === q.correctIndex;
+
+        if (isCorrect) {
+            quizScore++;
+            playCelebrationSound();
+        }
+
+        // تحديث ستايل الأزرار
+        const buttons = quizAnswersList ? quizAnswersList.querySelectorAll('.quiz-choice-btn') : [];
+        buttons.forEach((btn, idx) => {
+            btn.disabled = true;
+            if (idx === q.correctIndex) {
+                btn.classList.add('correct');
+            } else if (idx === selectedIndex && !isCorrect) {
+                btn.classList.add('incorrect');
+            }
+        });
+
+        // عرض التغذية الراجعة
+        if (quizFeedbackBox) {
+            quizFeedbackBox.style.display = 'block';
+            if (isCorrect) {
+                quizFeedbackBox.className = 'quiz-feedback-box correct-feedback';
+                quizFeedbackBox.innerHTML = `
+                    <div class="feedback-title"><i class="fa-solid fa-circle-check"></i> إجابة صحيحة ومباركة! ما شاء الله</div>
+                    <div class="feedback-desc">${escapeHtml(q.explanation)}</div>
+                `;
+            } else {
+                quizFeedbackBox.className = 'quiz-feedback-box incorrect-feedback';
+                quizFeedbackBox.innerHTML = `
+                    <div class="feedback-title"><i class="fa-solid fa-circle-xmark"></i> إجابة غير دقيقة، والإجابة الصحيحة موضحة بالأخضر</div>
+                    <div class="feedback-desc">${escapeHtml(q.explanation)}</div>
+                `;
+            }
+        }
+
+        // إظهار زر الانتقال للتالي
+        if (quizNextActionWrap) quizNextActionWrap.style.display = 'block';
+        if (quizLiveScore) quizLiveScore.textContent = `النقاط: ${toArabicDigits(quizScore)}`;
+    }
+
+    function showQuizResults() {
+        if (quizActiveScreen) quizActiveScreen.style.display = 'none';
+        if (quizResultScreen) quizResultScreen.style.display = 'block';
+
+        const percentage = Math.round((quizScore / quizTotalCount) * 100);
+
+        if (resultScoreDisplay) {
+            resultScoreDisplay.textContent = `${toArabicDigits(quizScore)} / ${toArabicDigits(quizTotalCount)}`;
+        }
+
+        if (percentage === 100) {
+            if (resultBadgeIcon) resultBadgeIcon.innerHTML = '<i class="fa-solid fa-crown" style="color:var(--gold);"></i>';
+            if (resultTitle) resultTitle.textContent = 'ما شاء الله! حفظ متقن ودرجة كاملة ١٠٠٪';
+            if (resultMessage) {
+                resultMessage.textContent = 'مبارك لك هذا الإتقان الراسخ لكتاب الله المبارك! حفظك راسخ ونيّر، جعلك الله من أهل القرآن الذين هم أهل الله وخاصته.';
+            }
+        } else if (percentage >= 70) {
+            if (resultBadgeIcon) resultBadgeIcon.innerHTML = '<i class="fa-solid fa-award" style="color:var(--gold);"></i>';
+            if (resultTitle) resultTitle.textContent = 'أحسنت! نتيجة طيبة ومستوى متقدم';
+            if (resultMessage) {
+                resultMessage.textContent = `حققت ${percentage}% من الإجابات الصحيحة. واصل المراجعة والتكرار مع المصحف المعلم لتثبيت بقية الآيات والارتقاء إلى الإتقان التام.`;
+            }
+        } else {
+            if (resultBadgeIcon) resultBadgeIcon.innerHTML = '<i class="fa-solid fa-book-open-reader" style="color:var(--gold);"></i>';
+            if (resultTitle) resultTitle.textContent = 'بداية موفقة وخطوة نحو التثبيت';
+            if (resultMessage) {
+                resultMessage.textContent = 'القرآن الكريم يثبت بكثرة المراجعة والتكرار؛ استعن بخاصية "تكرار الآية للحفظ" في المصحف المعلم وكرر المحاولة لتصل للدرجة الكاملة إن شاء الله.';
+            }
+        }
+    }
+
+    if (startQuizBtn) startQuizBtn.addEventListener('click', startHifzQuiz);
+
+    if (quizNextQuestionBtn) {
+        quizNextQuestionBtn.addEventListener('click', () => {
+            currentQuizQuestionIndex++;
+            renderQuizQuestion();
+        });
+    }
+
+    if (retryQuizBtn) {
+        retryQuizBtn.addEventListener('click', () => {
+            if (quizResultScreen) quizResultScreen.style.display = 'none';
+            if (quizSetupScreen) quizSetupScreen.style.display = 'block';
+            maqraahSection.scrollIntoView({ behavior: 'smooth' });
+        });
+    }
+
+    if (shareQuizBtn) {
+        shareQuizBtn.addEventListener('click', () => {
+            const shareText = `حققت نتيجة ${toArabicDigits(quizScore)} من أصل ${toArabicDigits(quizTotalCount)} في اختبار حفظ القرآن الكريم بمقرأة فضيلة الشيخ أحمد مرتضى حامد المباركة بالأقصر 🌟📖\nجرّب اختبار حفظك لكتاب الله: ${window.location.origin}${window.location.pathname}#maqraahSection`;
+            copyToClipboard(shareText, 'تم نسخ نتيجة الاختبار لمشاركتها مع إخوانك! 📋');
+        });
+    }
+
+    // -------------------------------------------------------------
+    // ح. التهيئة الأولية: تحميل سورة الفاتحة افتراضياً
+    // -------------------------------------------------------------
+    loadSurah(1);
+}
+
 

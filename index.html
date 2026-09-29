@@ -180,6 +180,7 @@
                 <a href="#hero" class="nav-link active"><i class="fa-solid fa-house-chimney"></i> الرئيسية</a>
                 <a href="#about" class="nav-link"><i class="fa-solid fa-user-tie"></i> عن الشيخ</a>
                 <a href="#videosSection" class="nav-link"><i class="fa-solid fa-film"></i> المكتبة المرئية</a>
+                <a href="#maqraahSection" class="nav-link"><i class="fa-solid fa-quran"></i> المقرأة القرآنية</a>
                 <a href="#scheduleSection" class="nav-link"><i class="fa-solid fa-calendar-check"></i> مواعيد الدروس</a>
                 <a href="#quotesSection" class="nav-link"><i class="fa-solid fa-feather-pointed"></i> درر ومواعظ</a>
                 <a href="#tasbihSection" class="nav-link"><i class="fa-solid fa-hand-holding-heart"></i> المسبحة</a>
@@ -465,6 +466,351 @@
                 <button id="resetFiltersBtn" class="btn btn-primary">
                     <i class="fa-solid fa-arrows-rotate"></i> إعادة تعيين البحث والتصنيفات
                 </button>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- Interactive Quran Maqra'ah & Memorization Suite -->
+    <section class="section-container maqraah-section" id="maqraahSection">
+        <div class="container">
+            <!-- Section Header -->
+            <div class="section-title-wrap text-center">
+                <span class="sub-heading"><i class="fa-solid fa-quran gold-icon"></i> الحلقات والمصحف المرتل • ساحة الأقصر</span>
+                <h2 class="section-title">مقرأة القرآن الكريم والمصحف المعلم</h2>
+                <div class="title-divider">
+                    <span class="divider-line"></span>
+                    <i class="fa-solid fa-star-and-crescent divider-icon"></i>
+                    <span class="divider-line"></span>
+                </div>
+                <p class="section-subtitle">
+                    «خَيْرُكُمْ مَنْ تَعَلَّمَ الْقُرْآنَ وَعَلَّمَهُ» - حلقات مباركة لتلاوة وحفظ كتاب الله، مع المصحف التفاعلي المرتل ونظام اختبارات التحفيظ والتسميع الذكية
+                </p>
+            </div>
+
+            <!-- Maqra'ah Navigation Modes (Tabs) -->
+            <div class="maqraah-tabs-bar" role="tablist">
+                <button type="button" class="maqraah-tab-btn active" data-tab="reader" role="tab" aria-selected="true">
+                    <i class="fa-solid fa-book-open"></i>
+                    <span>المصحف المعلم المرتل</span>
+                </button>
+                <button type="button" class="maqraah-tab-btn" data-tab="quiz" role="tab" aria-selected="false">
+                    <i class="fa-solid fa-graduation-cap"></i>
+                    <span>اختبارات التحفيظ والتسميع</span>
+                </button>
+                <button type="button" class="maqraah-tab-btn" data-tab="circles" role="tab" aria-selected="false">
+                    <i class="fa-solid fa-mosque"></i>
+                    <span>حلقات المقرأة بالساحة</span>
+                </button>
+            </div>
+
+            <!-- Tab 1: Interactive Audio Quran Reader -->
+            <div class="maqraah-tab-pane active" id="maqraahTabReader" role="tabpanel">
+                <div class="maqraah-card">
+                    <!-- Quran Control Toolbar -->
+                    <div class="quran-toolbar">
+                        <div class="quran-toolbar-row primary-controls">
+                            <!-- Surah Selection -->
+                            <div class="quran-select-group surah-group">
+                                <label for="quranSurahSelect"><i class="fa-solid fa-book-quran gold-icon"></i> السورة المباركة:</label>
+                                <select id="quranSurahSelect" class="custom-select quran-select">
+                                    <!-- Populated dynamically via JS with all 114 Surahs -->
+                                </select>
+                            </div>
+
+                            <!-- Reciter Selection -->
+                            <div class="quran-select-group reciter-group">
+                                <label for="quranReciterSelect"><i class="fa-solid fa-microphone-lines gold-icon"></i> القارئ المعلم:</label>
+                                <select id="quranReciterSelect" class="custom-select quran-select">
+                                    <option value="ar.husary">محمود خليل الحصري (المصحف المعلم - الترتيل)</option>
+                                    <option value="ar.minshawi">محمد صديق المنشاوي (المصحف المرتل)</option>
+                                    <option value="ar.abdulbasitmurattal">عبد الباسط عبد الصمد (مرتل)</option>
+                                    <option value="ar.alafasy">مشاري راشد العفاسي</option>
+                                </select>
+                            </div>
+
+                            <!-- Ayah Repeat Mode (For Memorization) -->
+                            <div class="quran-select-group repeat-group">
+                                <label for="quranRepeatSelect"><i class="fa-solid fa-repeat gold-icon"></i> تكرار الآية للحفظ:</label>
+                                <select id="quranRepeatSelect" class="custom-select quran-select">
+                                    <option value="1">مرة واحدة (قراءة متواصلة)</option>
+                                    <option value="3">تكرار ٣ مرات (تثبيت الحفظ)</option>
+                                    <option value="5">تكرار ٥ مرات (تلقين متقن)</option>
+                                    <option value="10">تكرار ١٠ مرات (للبراعم)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Secondary Toolbar: Features & Blind Mode -->
+                        <div class="quran-toolbar-row secondary-controls">
+                            <!-- Blind Recitation / Memorization Mode Toggle -->
+                            <button type="button" class="tool-toggle-btn blind-recite-btn" id="blindReciteToggle" title="إخفاء كلمات الآيات للتسميع غيباً، وبالنقر على أي آية تظهر للتأكد من حفظك" aria-pressed="false">
+                                <i class="fa-solid fa-eye-slash"></i>
+                                <span>وضع التسميع الذاتي (إخفاء/كشف الآيات)</span>
+                            </button>
+
+                            <!-- Audio Play All / Pause Button -->
+                            <div class="quran-action-buttons">
+                                <button type="button" class="btn btn-primary btn-sm" id="quranPlaySurahBtn">
+                                    <i class="fa-solid fa-play"></i>
+                                    <span>تشغيل تلاوة السورة</span>
+                                </button>
+                                <button type="button" class="btn btn-outline btn-sm" id="quranStopBtn" style="display: none;">
+                                    <i class="fa-solid fa-stop"></i>
+                                    <span>إيقاف التلاوة</span>
+                                </button>
+                            </div>
+
+                            <!-- Font Size Controls -->
+                            <div class="quran-font-controls">
+                                <span class="font-ctrl-label">حجم الخط:</span>
+                                <button type="button" class="font-zoom-btn" id="quranZoomOutBtn" title="تصغير الخط" aria-label="تصغير الخط">A-</button>
+                                <button type="button" class="font-zoom-btn" id="quranZoomInBtn" title="تكبير الخط" aria-label="تكبير الخط">A+</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Surah Ornamented Banner Header -->
+                    <div class="surah-header-banner" id="surahHeaderBanner">
+                        <div class="surah-ornament-corner top-right"></div>
+                        <div class="surah-ornament-corner bottom-left"></div>
+                        <div class="surah-meta-pill" id="surahMetaType">مكية • ٧ آيات</div>
+                        <h3 class="surah-title-arabic" id="surahTitleDisplay">سُورَةُ الفَاتِحَةِ</h3>
+                        <div class="surah-subtitle-info" id="surahSubtitleInfo">ترتيبها بالمصحف: ١ • التلاوة برواية حفص عن عاصم</div>
+                        <div class="basmala-decor-banner" id="surahBasmalaBanner">
+                            <span class="basmala-calligraphy">بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ</span>
+                        </div>
+                    </div>
+
+                    <!-- Blind Recitation Helper Notice (shown only when mode is on) -->
+                    <div class="blind-mode-notice" id="blindModeNotice" style="display: none;">
+                        <i class="fa-solid fa-lightbulb gold-icon"></i>
+                        <span>أنت الآن في <strong>وضع التسميع الذاتي</strong>: اقرأ الآيات غيباً من صدرك، وإذا نسيت أي آية أو ترددت فيها، اضغط عليها لمسة واحدة فتظهر لك فوراً!</span>
+                    </div>
+
+                    <!-- Verses Reading View -->
+                    <div class="quran-verses-container" id="quranVersesContainer">
+                        <!-- Verses will be loaded dynamically via MaqraahEngine in app.js -->
+                        <div class="quran-loading-state">
+                            <i class="fa-solid fa-circle-notch fa-spin gold-icon"></i>
+                            <span>جاري فتح المصحف الشريف المبارك...</span>
+                        </div>
+                    </div>
+
+                    <!-- Active Floating Audio Player Bar -->
+                    <div class="quran-floating-audio-bar" id="quranFloatingAudioBar" style="display: none;">
+                        <div class="audio-bar-inner">
+                            <div class="audio-current-info">
+                                <i class="fa-solid fa-volume-high gold-icon"></i>
+                                <span class="audio-ayah-badge" id="audioCurrentAyahBadge">الآية ١</span>
+                                <span class="audio-reciter-name" id="audioCurrentReciter">الشيخ الحصري</span>
+                                <span class="audio-repeat-badge" id="audioRepeatBadge" style="display: none;">تكرار: 1/3</span>
+                            </div>
+                            <div class="audio-playback-controls">
+                                <button type="button" class="audio-ctrl-btn" id="audioPrevAyahBtn" title="الآية السابقة">
+                                    <i class="fa-solid fa-forward-step"></i>
+                                </button>
+                                <button type="button" class="audio-play-pause-btn" id="audioTogglePlayBtn" title="تشغيل / إيقاف مؤقت">
+                                    <i class="fa-solid fa-pause"></i>
+                                </button>
+                                <button type="button" class="audio-ctrl-btn" id="audioNextAyahBtn" title="الآية التالية">
+                                    <i class="fa-solid fa-backward-step"></i>
+                                </button>
+                                <button type="button" class="audio-ctrl-btn close-audio-btn" id="audioCloseBtn" title="إغلاق المشغل">
+                                    <i class="fa-solid fa-xmark"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab 2: Smart Hifz Quizzes & Memorization Tests -->
+            <div class="maqraah-tab-pane" id="maqraahTabQuiz" role="tabpanel" style="display: none;">
+                <div class="maqraah-card quiz-card-wrapper">
+                    <!-- Quiz Intro & Setup Screen -->
+                    <div class="quiz-setup-screen" id="quizSetupScreen">
+                        <div class="quiz-intro-header text-center">
+                            <div class="quiz-intro-icon">
+                                <i class="fa-solid fa-award"></i>
+                            </div>
+                            <h3>اختبر حفظك وإتقانك لكتاب الله</h3>
+                            <p>نظام اختبارات تفاعلي وذكي لطلاب المقرأة وحفاظ القرآن الكريم. حدد السورة أو النطاق وابدأ في قياس قوة حفظك وتثبيتك للآيات الكريمة والمتشابهات.</p>
+                        </div>
+
+                        <div class="quiz-options-grid">
+                            <div class="quiz-option-field">
+                                <label for="quizScopeSelect"><i class="fa-solid fa-layer-group gold-icon"></i> نطاق الاختبار:</label>
+                                <select id="quizScopeSelect" class="custom-select">
+                                    <option value="juz_amma">جزء عمَّ (سورة النبأ إلى الناس)</option>
+                                    <option value="surah_kahf">سورة الكهف المباركة</option>
+                                    <option value="surah_yasin">سورة يس المباركة</option>
+                                    <option value="surah_mulk">سورة الملك المباركة</option>
+                                    <option value="surah_waqiah">سورة الواقعة المباركة</option>
+                                    <option value="surah_rahman">سورة الرحمن المباركة</option>
+                                    <option value="juz_tabarak">جزء تبارك (الملك إلى المرسلات)</option>
+                                    <option value="surah_fatiha_baqarah_intro">فاتحة الكتاب وأوائل البقرة</option>
+                                </select>
+                            </div>
+
+                            <div class="quiz-option-field">
+                                <label for="quizLengthSelect"><i class="fa-solid fa-list-check gold-icon"></i> عدد أسئلة الاختبار:</label>
+                                <select id="quizLengthSelect" class="custom-select">
+                                    <option value="5">٥ أسئلة (اختبار سريع ومباشر)</option>
+                                    <option value="10">١٠ أسئلة (اختبار شامل ومكثف)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="quiz-start-action text-center">
+                            <button type="button" class="btn btn-primary btn-lg" id="startQuizBtn">
+                                <i class="fa-solid fa-play"></i>
+                                <span>ابدأ اختبار الحفظ الآن</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Active Quiz Playing Screen -->
+                    <div class="quiz-active-screen" id="quizActiveScreen" style="display: none;">
+                        <div class="quiz-progress-header">
+                            <div class="quiz-step-info">
+                                <span class="quiz-step-text" id="quizStepText">السؤال ١ من ٥</span>
+                                <span class="quiz-score-badge" id="quizLiveScore">النقاط: ٠</span>
+                            </div>
+                            <div class="quiz-progress-track">
+                                <div class="quiz-progress-fill" id="quizProgressBarFill" style="width: 20%;"></div>
+                            </div>
+                        </div>
+
+                        <div class="quiz-question-card">
+                            <span class="quiz-type-pill" id="quizTypePill">
+                                <i class="fa-solid fa-arrow-down-short-wide"></i> أكمل الآية المباركة التالية
+                            </span>
+                            <div class="quiz-prompt-text" id="quizPromptText">
+                                ما هي الآية الكريمة التي تلي هذه الآية مباشرة؟
+                            </div>
+                            <div class="quiz-ayah-display" id="quizAyahPrompt">
+                                «...»
+                            </div>
+                            <div class="quiz-ayah-source-info" id="quizAyahSourceInfo">
+                                [سورة ...]
+                            </div>
+
+                            <div class="quiz-answers-list" id="quizAnswersList">
+                                <!-- Populated dynamically with answer choice buttons -->
+                            </div>
+
+                            <div class="quiz-feedback-box" id="quizFeedbackBox" style="display: none;">
+                                <!-- Instant explanation or feedback message -->
+                            </div>
+
+                            <div class="quiz-next-action" id="quizNextActionWrap" style="display: none;">
+                                <button type="button" class="btn btn-gold" id="quizNextQuestionBtn">
+                                    <span>السؤال التالي</span>
+                                    <i class="fa-solid fa-chevron-left"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quiz Result & Completion Screen -->
+                    <div class="quiz-result-screen" id="quizResultScreen" style="display: none;">
+                        <div class="result-celebration-wrap text-center">
+                            <div class="result-badge-icon" id="resultBadgeIcon">
+                                <i class="fa-solid fa-award"></i>
+                            </div>
+                            <h3 class="result-title" id="resultTitle">مبارك! أتممت الاختبار بنجاح</h3>
+                            <div class="result-score-circle">
+                                <span class="result-score-number" id="resultScoreDisplay">٥ / ٥</span>
+                                <span class="result-score-label">إجابات صحيحة</span>
+                            </div>
+                            <p class="result-message" id="resultMessage">
+                                ما شاء الله تبارك الله! حفظ متقن ومبارك، نفعك الله بالقرآن الكريم وجعله شفيعاً لك يوم القيامة.
+                            </p>
+                            <div class="result-actions-row">
+                                <button type="button" class="btn btn-primary" id="retryQuizBtn">
+                                    <i class="fa-solid fa-rotate-right"></i>
+                                    <span>إجراء اختبار جديد</span>
+                                </button>
+                                <button type="button" class="btn btn-outline-gold" id="shareQuizResultBtn">
+                                    <i class="fa-solid fa-share-nodes"></i>
+                                    <span>مشاركة النتيجة</span>
+                                </button>
+                                <button type="button" class="btn btn-outline" id="backToQuranReaderBtn">
+                                    <i class="fa-solid fa-book-open"></i>
+                                    <span>العودة للمصحف المعلم</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab 3: Saaha Quran Circles Info & Registration -->
+            <div class="maqraah-tab-pane" id="maqraahTabCircles" role="tabpanel" style="display: none;">
+                <div class="maqraah-card circles-info-card">
+                    <div class="circles-header text-center">
+                        <div class="crest-icon-medium">
+                            <i class="fa-solid fa-mosque"></i>
+                        </div>
+                        <h3>حلقات ومجالس تحفيظ القرآن الكريم بساحة الأقصر</h3>
+                        <p class="circles-sub">
+                            انطلاقاً من قوله ﷺ: «أَهْلُ الْقُرْآنِ هُمْ أَهْلُ اللَّهِ وَخَاصَّتُهُ»، تُعقد بساحة فضيلة الشيخ أحمد مرتضى حامد بالأقصر حلقات قرآنية يومية وأسبوعية مباركة لجميع الأعمار تحت إشراف نخبة من كبار المقرئين الأزهريين.
+                        </p>
+                    </div>
+
+                    <div class="circles-features-grid">
+                        <div class="circle-card">
+                            <div class="circle-icon">
+                                <i class="fa-solid fa-seedling"></i>
+                            </div>
+                            <h4>حلقات براعم القرآن (الأطفال)</h4>
+                            <p>تلقين السور القصيرة بالتكرار، وتأسيس مخارج الحروف الصحيحة وحب كتاب الله بأسلوب تربوي مشوق يراعي مدارك الأطفال.</p>
+                            <span class="circle-time-pill"><i class="fa-regular fa-clock"></i> يومياً بعد العصر</span>
+                        </div>
+
+                        <div class="circle-card">
+                            <div class="circle-icon">
+                                <i class="fa-solid fa-microphone-lines"></i>
+                            </div>
+                            <h4>حلقات تصحيح التلاوة والتجويد</h4>
+                            <p>مدارسة أحكام التلاوة والتجويد العملي (أحكام النون والميم الساكنتين، والمدود والوقف والابتداء) مع القراءة الفردية والتصحيح المباشر.</p>
+                            <span class="circle-time-pill"><i class="fa-regular fa-clock"></i> الأحد والأربعاء بين المغرب والعشاء</span>
+                        </div>
+
+                        <div class="circle-card">
+                            <div class="circle-icon">
+                                <i class="fa-solid fa-book-bookmark"></i>
+                            </div>
+                            <h4>حلقات حفظ ومراجعة الأجزاء</h4>
+                            <p>متابعة دورية لحفظ الأجزاء القرآنية، وتثبيت المحفوظ عبر ورد تسميع منتظم مع رفقاء الدرب في رحاب الساحة المباركة.</p>
+                            <span class="circle-time-pill"><i class="fa-regular fa-clock"></i> السبت والاثنين بعد صلاة المغرب</span>
+                        </div>
+
+                        <div class="circle-card">
+                            <div class="circle-icon">
+                                <i class="fa-solid fa-scroll"></i>
+                            </div>
+                            <h4>حلقات المتون والإجازات بالأسانيد</h4>
+                            <p>شرح وحفظ متني "تحفة الأطفال" و"المقدمة الجزرية"، وإقراء الختمة برواية حفص عن عاصم بالسند المتصل إلى سيدنا رسول الله ﷺ للمتقنين.</p>
+                            <span class="circle-time-pill"><i class="fa-regular fa-clock"></i> الجمعة صباحاً والمجالس المجدولة</span>
+                        </div>
+                    </div>
+
+                    <!-- Saaha Maqraah Contact & Registration CTA -->
+                    <div class="circles-cta-banner">
+                        <div class="cta-banner-text">
+                            <h4><i class="fa-solid fa-hand-holding-heart gold-icon"></i> هل ترغب بالالتحاق بحلقات القرآن أو تسجيل أطفالك؟</h4>
+                            <p>الالتحاق بمقرأة الساحة متاح مجاناً لوجه الله تعالى لجميع الأعمار؛ تواصل معنا مباشرة لتنسيق الحلقة وموعد الحضور المناسب لك.</p>
+                        </div>
+                        <div class="cta-banner-actions">
+                            <a href="https://wa.me/?text=%D8%A7%D9%84%D8%B3%D9%84%D8%A7%D9%85%20%D8%B9%D9%84%D9%8A%D9%83%D9%85%20%D9%88%D8%B1%D8%AD%D9%85%D8%A9%20%D8%A7%D9%84%D9%84%D9%87%D8%8C%20%D8%A3%D8%B1%D8%BA%D8%A8%20%D8%A8%D8%A7%D9%84%D8%A7%D9%84%D8%AA%D8%AD%D8%A7%D9%82%20%D8%A8%D9%85%D9%82%D8%B1%D8%A3%D8%A9%20%D8%B3%D8%A7%D8%AD%D8%A9%20%D9%81%D8%B6%D9%8A%D9%84%D8%A9%20%D8%A7%D9%84%D8%B4%D9%8A%D8%AE%20%D8%A3%D8%AD%D9%85%D8%AF%20%D9%85%D8%B1%D8%AA%D8%B6%D9%89%20%D8%A8%D8%A7%D9%84%D8%A3%D9%82%D8%B5%D8%B1" target="_blank" rel="noopener" class="btn btn-whatsapp-direct">
+                                <i class="fa-brands fa-whatsapp"></i>
+                                <span>التواصل مع المقرأة عبر واتساب</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
             </div>
 
         </div>
@@ -1018,6 +1364,7 @@
                     <li><a href="#hero"><i class="fa-solid fa-chevron-left"></i> الرئيسية</a></li>
                     <li><a href="#about"><i class="fa-solid fa-chevron-left"></i> سيرة ومنهج الشيخ</a></li>
                     <li><a href="#videosSection"><i class="fa-solid fa-chevron-left"></i> المكتبة المرئية الشاملة</a></li>
+                    <li><a href="#maqraahSection"><i class="fa-solid fa-chevron-left"></i> المقرأة القرآنية والمصحف</a></li>
                     <li><a href="#scheduleSection"><i class="fa-solid fa-chevron-left"></i> مواعيد الدروس والمجالس</a></li>
                     <li><a href="#tasbihSection"><i class="fa-solid fa-chevron-left"></i> المسبحة الإلكترونية</a></li>
                 </ul>
