@@ -202,6 +202,35 @@
                         </div>
                     </div>
 
+                    <!-- شريط أوضاع عرض المصحف الاحترافية وتقسيم الصفحات -->
+                    <div class="quran-view-modes-bar">
+                        <div class="view-modes-group" role="radiogroup" aria-label="أوضاع عرض المصحف">
+                            <button type="button" class="view-mode-btn active" data-mode="pages" id="viewModePagesBtn" title="عرض السورة مقسمة إلى صفحات ومقاطع مريحة للعين لمنع التشتت">
+                                <i class="fa-solid fa-book-open"></i>
+                                <span>عرض الصفحات والمقاطع</span>
+                            </button>
+                            <button type="button" class="view-mode-btn" data-mode="focus" id="viewModeFocusBtn" title="عرض آية واحدة فقط بتركيز عالي مع التكرار للتحفيظ المتقن">
+                                <i class="fa-solid fa-bullseye"></i>
+                                <span>وضع التركيز (آية آية)</span>
+                            </button>
+                            <button type="button" class="view-mode-btn" data-mode="continuous" id="viewModeContinuousBtn" title="عرض السورة كاملة في صفحة واحدة متصلة">
+                                <i class="fa-solid fa-scroll"></i>
+                                <span>عرض السورة كاملة</span>
+                            </button>
+                        </div>
+
+                        <!-- تخصيص حجم الصفحة (عدد الآيات في المقطع) -->
+                        <div class="page-size-picker" id="pageSizePickerWrap">
+                            <label for="quranPageSizeSelect"><i class="fa-solid fa-layer-group gold-icon"></i> حجم المقطع:</label>
+                            <select id="quranPageSizeSelect" class="custom-select quran-select-sm">
+                                <option value="10">١٠ آيات بالصفحة</option>
+                                <option value="15" selected>١٥ آية بالصفحة</option>
+                                <option value="20">٢٠ آية بالصفحة</option>
+                                <option value="30">٣٠ آية بالصفحة</option>
+                            </select>
+                        </div>
+                    </div>
+
                     <!-- هيدر السورة الزخرفي -->
                     <div class="surah-header-banner" id="surahHeaderBanner">
                         <div class="surah-ornament-corner top-right"></div>
@@ -220,12 +249,58 @@
                         <span>أنت الآن في <strong>وضع التسميع الذاتي</strong>: اقرأ الآيات غيباً من صدرك، وإذا نسيت أي آية أو ترددت فيها، اضغط عليها لمسة واحدة فتظهر لك فوراً!</span>
                     </div>
 
+                    <!-- شريط التنقل العلوي بين الصفحات والآيات -->
+                    <div class="quran-pagination-bar" id="quranPaginationTop">
+                        <button type="button" class="page-nav-btn prev-page-btn" id="quranPrevPageBtnTop" title="الصفحة السابقة">
+                            <i class="fa-solid fa-chevron-right"></i>
+                            <span>الصفحة السابقة</span>
+                        </button>
+
+                        <div class="pagination-center-info">
+                            <span class="page-current-indicator" id="quranPageIndicatorTop">صفحة ١ من ١</span>
+                            <span class="page-ayah-range" id="quranAyahRangeTop">(الآيات ١ - ٧)</span>
+                            <div class="quick-ayah-jump">
+                                <label for="quickAyahInputTop" class="sr-only">انتقال لآية</label>
+                                <input type="number" id="quickAyahInputTop" class="quick-ayah-input" placeholder="آية..." min="1" max="286" title="اكتب رقم الآية واضغط Enter للانتقال الفوري" />
+                                <button type="button" class="quick-jump-btn" id="quickAyahJumpBtnTop" title="انتقال">
+                                    <i class="fa-solid fa-arrow-left"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <button type="button" class="page-nav-btn next-page-btn" id="quranNextPageBtnTop" title="الصفحة التالية">
+                            <span>الصفحة التالية</span>
+                            <i class="fa-solid fa-chevron-left"></i>
+                        </button>
+                    </div>
+
+                    <!-- شريط التقدم الدقيق للسورة -->
+                    <div class="quran-reading-progress-wrap" id="quranReadingProgressWrap">
+                        <div class="quran-reading-progress-bar" id="quranReadingProgressBar" style="width: 0%;"></div>
+                    </div>
+
                     <!-- حاوية عرض الآيات الكريمة -->
                     <div class="quran-verses-container" id="quranVersesContainer">
                         <div class="quran-loading-state">
                             <i class="fa-solid fa-circle-notch fa-spin gold-icon"></i>
                             <span>جاري فتح المصحف الشريف المبارك...</span>
                         </div>
+                    </div>
+
+                    <!-- شريط التنقل السفلي بين الصفحات -->
+                    <div class="quran-pagination-bar bottom-pagination" id="quranPaginationBottom">
+                        <button type="button" class="page-nav-btn prev-page-btn" id="quranPrevPageBtnBottom" title="الصفحة السابقة">
+                            <i class="fa-solid fa-chevron-right"></i>
+                            <span>الصفحة السابقة</span>
+                        </button>
+                        <div class="pagination-center-info">
+                            <span class="page-current-indicator" id="quranPageIndicatorBottom">صفحة ١ من ١</span>
+                            <span class="page-ayah-range" id="quranAyahRangeBottom">(الآيات ١ - ٧)</span>
+                        </div>
+                        <button type="button" class="page-nav-btn next-page-btn" id="quranNextPageBtnBottom" title="الصفحة التالية">
+                            <span>الصفحة التالية</span>
+                            <i class="fa-solid fa-chevron-left"></i>
+                        </button>
                     </div>
 
                     <!-- مشغل الصوت العائم السفلي -->

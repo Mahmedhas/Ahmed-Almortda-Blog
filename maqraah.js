@@ -602,7 +602,11 @@ function initMaqraahEngine() {
         audioPlayer: null,
         isPlaying: false,
         isBlindMode: false,
-        fontSizeLevel: 2
+        fontSizeLevel: 2,
+        viewMode: localStorage.getItem('sheikh_quran_view_mode') || 'pages', // 'pages' | 'focus' | 'continuous'
+        pageSize: parseInt(localStorage.getItem('sheikh_quran_page_size'), 10) || 15,
+        currentPage: 0,
+        currentFocusAyahIndex: 0
     };
 
     const surahCache = new Map();
@@ -617,6 +621,27 @@ function initMaqraahEngine() {
     const zoomInBtn = document.getElementById('quranZoomInBtn');
     const zoomOutBtn = document.getElementById('quranZoomOutBtn');
     const versesContainer = document.getElementById('quranVersesContainer');
+
+    // أدوات أوضاع العرض وتقسيم الصفحات
+    const viewModePagesBtn = document.getElementById('viewModePagesBtn');
+    const viewModeFocusBtn = document.getElementById('viewModeFocusBtn');
+    const viewModeContinuousBtn = document.getElementById('viewModeContinuousBtn');
+    const pageSizeSelect = document.getElementById('quranPageSizeSelect');
+    const pageSizePickerWrap = document.getElementById('pageSizePickerWrap');
+
+    const paginationTop = document.getElementById('quranPaginationTop');
+    const paginationBottom = document.getElementById('quranPaginationBottom');
+    const pageIndicatorTop = document.getElementById('quranPageIndicatorTop');
+    const pageIndicatorBottom = document.getElementById('quranPageIndicatorBottom');
+    const ayahRangeTop = document.getElementById('quranAyahRangeTop');
+    const ayahRangeBottom = document.getElementById('quranAyahRangeBottom');
+    const prevPageBtnTop = document.getElementById('quranPrevPageBtnTop');
+    const nextPageBtnTop = document.getElementById('quranNextPageBtnTop');
+    const prevPageBtnBottom = document.getElementById('quranPrevPageBtnBottom');
+    const nextPageBtnBottom = document.getElementById('quranNextPageBtnBottom');
+    const quickAyahInputTop = document.getElementById('quickAyahInputTop');
+    const quickAyahJumpBtnTop = document.getElementById('quickAyahJumpBtnTop');
+    const readingProgressBar = document.getElementById('quranReadingProgressBar');
 
     const surahSearchInput = document.getElementById('surahSearchInput');
     const surahSearchClearBtn = document.getElementById('surahSearchClearBtn');
@@ -727,6 +752,149 @@ function initMaqraahEngine() {
             updateRepeatBadgeUI();
         });
     }
+
+    // ت. إدارة أوضاع العرض وتقسيم الصفحات
+    function updateViewModeButtonsUI() {
+        if (viewModePagesBtn) viewModePagesBtn.classList.toggle('active', quranState.viewMode === 'pages');
+        if (viewModeFocusBtn) viewModeFocusBtn.classList.toggle('active', quranState.viewMode === 'focus');
+        if (viewModeContinuousBtn) viewModeContinuousBtn.classList.toggle('active', quranState.viewMode === 'continuous');
+
+        if (pageSizePickerWrap) {
+            pageSizePickerWrap.style.display = quranState.viewMode === 'pages' ? 'inline-flex' : 'none';
+        }
+        if (pageSizeSelect) {
+            pageSizeSelect.value = String(quranState.pageSize);
+        }
+    }
+
+    if (viewModePagesBtn) {
+        viewModePagesBtn.addEventListener('click', () => {
+            quranState.viewMode = 'pages';
+            localStorage.setItem('sheikh_quran_view_mode', 'pages');
+            updateViewModeButtonsUI();
+            renderVersesView();
+            showToast('تم تفعيل عرض الصفحات والمقاطع 📖');
+        });
+    }
+
+    if (viewModeFocusBtn) {
+        viewModeFocusBtn.addEventListener('click', () => {
+            quranState.viewMode = 'focus';
+            localStorage.setItem('sheikh_quran_view_mode', 'focus');
+            updateViewModeButtonsUI();
+            renderVersesView();
+            showToast('تم تفعيل وضع التركيز (آية آية) للتحفيظ المتقن 🎯');
+        });
+    }
+
+    if (viewModeContinuousBtn) {
+        viewModeContinuousBtn.addEventListener('click', () => {
+            quranState.viewMode = 'continuous';
+            localStorage.setItem('sheikh_quran_view_mode', 'continuous');
+            updateViewModeButtonsUI();
+            renderVersesView();
+            showToast('تم تفعيل عرض السورة كاملة 📜');
+        });
+    }
+
+    if (pageSizeSelect) {
+        pageSizeSelect.addEventListener('change', (e) => {
+            quranState.pageSize = parseInt(e.target.value, 10) || 15;
+            quranState.currentPage = 0;
+            localStorage.setItem('sheikh_quran_page_size', String(quranState.pageSize));
+            renderVersesView();
+        });
+    }
+
+    function goToPage(pageIndex) {
+        if (!quranState.ayahsData || quranState.ayahsData.length === 0) return;
+        const totalPages = Math.ceil(quranState.ayahsData.length / quranState.pageSize);
+        if (pageIndex < 0 || pageIndex >= totalPages) return;
+        quranState.currentPage = pageIndex;
+        renderVersesView();
+        if (versesContainer) {
+            versesContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+    }
+
+    [prevPageBtnTop, prevPageBtnBottom].forEach(btn => {
+        if (btn) btn.addEventListener('click', () => goToPage(quranState.currentPage - 1));
+    });
+
+    [nextPageBtnTop, nextPageBtnBottom].forEach(btn => {
+        if (btn) btn.addEventListener('click', () => goToPage(quranState.currentPage + 1));
+    });
+
+    function goToFocusAyah(index) {
+        if (!quranState.ayahsData || quranState.ayahsData.length === 0) return;
+        if (index < 0 || index >= quranState.ayahsData.length) return;
+        quranState.currentFocusAyahIndex = index;
+        renderVersesView();
+    }
+
+    function handleQuickJump() {
+        if (!quickAyahInputTop || !quranState.ayahsData || quranState.ayahsData.length === 0) return;
+        const targetAyah = parseInt(quickAyahInputTop.value.trim(), 10);
+        if (!targetAyah || targetAyah < 1 || targetAyah > quranState.ayahsData.length) {
+            showToast(`يرجى كتابة رقم آية صحيح بين ١ و ${quranState.ayahsData.length}`, 'error');
+            return;
+        }
+
+        const ayahIndex = targetAyah - 1;
+        if (quranState.viewMode === 'focus') {
+            quranState.currentFocusAyahIndex = ayahIndex;
+            renderVersesView();
+        } else if (quranState.viewMode === 'pages') {
+            quranState.currentPage = Math.floor(ayahIndex / quranState.pageSize);
+            renderVersesView();
+            setTimeout(() => {
+                const targetEl = document.querySelector(`.quran-ayah[data-index="${ayahIndex}"]`);
+                if (targetEl) {
+                    targetEl.classList.add('playing-ayah');
+                    targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    setTimeout(() => targetEl.classList.remove('playing-ayah'), 2500);
+                }
+            }, 100);
+        } else {
+            const targetEl = document.querySelector(`.quran-ayah[data-index="${ayahIndex}"]`);
+            if (targetEl) {
+                targetEl.classList.add('playing-ayah');
+                targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                setTimeout(() => targetEl.classList.remove('playing-ayah'), 2500);
+            }
+        }
+        quickAyahInputTop.value = '';
+    }
+
+    if (quickAyahJumpBtnTop) quickAyahJumpBtnTop.addEventListener('click', handleQuickJump);
+    if (quickAyahInputTop) {
+        quickAyahInputTop.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                handleQuickJump();
+            }
+        });
+    }
+
+    // Keyboard navigation (ArrowLeft: التالي, ArrowRight: السابق)
+    document.addEventListener('keydown', (e) => {
+        const activeTag = document.activeElement ? document.activeElement.tagName.toLowerCase() : '';
+        if (activeTag === 'input' || activeTag === 'textarea' || activeTag === 'select') return;
+
+        if (e.key === 'ArrowLeft') {
+            if (quranState.viewMode === 'pages') {
+                goToPage(quranState.currentPage + 1);
+            } else if (quranState.viewMode === 'focus') {
+                goToFocusAyah(quranState.currentFocusAyahIndex + 1);
+            }
+        } else if (e.key === 'ArrowRight') {
+            if (quranState.viewMode === 'pages') {
+                goToPage(quranState.currentPage - 1);
+            } else if (quranState.viewMode === 'focus') {
+                goToFocusAyah(quranState.currentFocusAyahIndex - 1);
+            }
+        }
+    });
 
     // ج. نظام البحث اللحظي بالكتابة عن السورة (Live Surah Search Engine)
     function initSurahSearch() {
@@ -904,6 +1072,8 @@ function initMaqraahEngine() {
         quranState.currentSurah = surahNumber;
         quranState.currentPlayingAyahIndex = -1;
         quranState.currentAyahPlayRepeat = 0;
+        quranState.currentPage = 0;
+        quranState.currentFocusAyahIndex = 0;
 
         const surahMeta = QURAN_SURAHS.find(s => s.number === surahNumber) || QURAN_SURAHS[0];
 
@@ -911,6 +1081,11 @@ function initMaqraahEngine() {
         if (surahMetaType) surahMetaType.textContent = `${surahMeta.type} • ${surahMeta.ayahs} آيات`;
         if (surahSubtitleInfo) {
             surahSubtitleInfo.textContent = `ترتيبها بالمصحف الشريف: ${surahMeta.number} • التلاوة برواية حفص عن عاصم`;
+        }
+
+        if (quickAyahInputTop) {
+            quickAyahInputTop.max = surahMeta.ayahs;
+            quickAyahInputTop.placeholder = `١ - ${surahMeta.ayahs}`;
         }
 
         if (surahBasmalaBanner) {
@@ -986,16 +1161,163 @@ function initMaqraahEngine() {
 
     function renderVerses(ayahs) {
         quranState.ayahsData = ayahs;
-        if (!versesContainer) return;
+        renderVersesView();
+    }
+
+    function renderVersesView() {
+        if (!versesContainer || !quranState.ayahsData || quranState.ayahsData.length === 0) return;
+        const ayahs = quranState.ayahsData;
+        const surahMeta = QURAN_SURAHS.find(s => s.number === quranState.currentSurah) || QURAN_SURAHS[0];
+
+        updateViewModeButtonsUI();
+
+        // 1) وضع التركيز (آية آية - Focus Mode)
+        if (quranState.viewMode === 'focus') {
+            if (paginationTop) paginationTop.style.display = 'none';
+            if (paginationBottom) paginationBottom.style.display = 'none';
+
+            if (quranState.currentFocusAyahIndex < 0) quranState.currentFocusAyahIndex = 0;
+            if (quranState.currentFocusAyahIndex >= ayahs.length) quranState.currentFocusAyahIndex = ayahs.length - 1;
+
+            const curIndex = quranState.currentFocusAyahIndex;
+            const curAyah = ayahs[curIndex] || ayahs[0];
+            const isPlayingThis = (quranState.isPlaying && quranState.currentPlayingAyahIndex === curIndex);
+
+            if (readingProgressBar) {
+                const pct = Math.round(((curIndex + 1) / ayahs.length) * 100);
+                readingProgressBar.style.width = `${pct}%`;
+            }
+
+            versesContainer.innerHTML = '';
+            versesContainer.style.textAlign = 'center';
+
+            const card = document.createElement('div');
+            card.className = 'quran-focus-card';
+
+            card.innerHTML = `
+                <div class="focus-header-meta">
+                    <span class="focus-surah-tag"><i class="fa-solid fa-book-quran gold-icon"></i> سورة ${escapeHtml(surahMeta.name)}</span>
+                    <span class="focus-ayah-badge">الآية ${toArabicDigits(curAyah.numberInSurah)} من ${toArabicDigits(ayahs.length)}</span>
+                    <button type="button" class="focus-blind-toggle ${quranState.isBlindMode ? 'active' : ''}" id="focusBlindToggleBtn" title="${quranState.isBlindMode ? 'كشف كلمات الآية' : 'إخفاء كلمات الآية للتسميع'}">
+                        <i class="fa-solid ${quranState.isBlindMode ? 'fa-eye' : 'fa-eye-slash'}"></i>
+                    </button>
+                </div>
+                <div class="focus-ayah-content" id="focusAyahContent" title="اضغط لكشف أو إخفاء الآية للتسميع">
+                    <div class="focus-ayah-text ${quranState.isBlindMode ? 'masked' : ''}" id="focusAyahText">${escapeHtml(curAyah.text)}</div>
+                    <div class="focus-ayah-number">﴿${toArabicDigits(curAyah.numberInSurah)}﴾</div>
+                </div>
+                <div class="focus-navigation-controls">
+                    <button type="button" class="btn btn-outline btn-sm focus-nav-btn" id="focusPrevAyahBtn" ${curIndex === 0 ? 'disabled' : ''}>
+                        <i class="fa-solid fa-chevron-right"></i>
+                        <span>الآية السابقة</span>
+                    </button>
+                    <button type="button" class="btn btn-primary btn-sm focus-play-btn" id="focusPlayCurrentBtn">
+                        <i class="fa-solid ${isPlayingThis ? 'fa-pause' : 'fa-play'}"></i>
+                        <span>${isPlayingThis ? 'إيقاف مؤقت' : 'استماع وتكرار'}</span>
+                    </button>
+                    <button type="button" class="btn btn-outline btn-sm focus-nav-btn" id="focusNextAyahBtn" ${curIndex === ayahs.length - 1 ? 'disabled' : ''}>
+                        <span>الآية التالية</span>
+                        <i class="fa-solid fa-chevron-left"></i>
+                    </button>
+                </div>
+            `;
+
+            versesContainer.appendChild(card);
+
+            const prevBtn = card.querySelector('#focusPrevAyahBtn');
+            const nextBtn = card.querySelector('#focusNextAyahBtn');
+            const playBtn = card.querySelector('#focusPlayCurrentBtn');
+            const blindBtn = card.querySelector('#focusBlindToggleBtn');
+            const contentBox = card.querySelector('#focusAyahContent');
+            const textEl = card.querySelector('#focusAyahText');
+
+            if (prevBtn) prevBtn.addEventListener('click', () => goToFocusAyah(curIndex - 1));
+            if (nextBtn) nextBtn.addEventListener('click', () => goToFocusAyah(curIndex + 1));
+            if (playBtn) {
+                playBtn.addEventListener('click', () => {
+                    if (quranState.isPlaying && quranState.currentPlayingAyahIndex === curIndex) {
+                        togglePlaySurah();
+                    } else {
+                        playAyahByIndex(curIndex);
+                    }
+                });
+            }
+            if (blindBtn) {
+                blindBtn.addEventListener('click', () => {
+                    if (textEl) textEl.classList.toggle('masked');
+                });
+            }
+            if (contentBox) {
+                contentBox.addEventListener('click', () => {
+                    if (textEl && textEl.classList.contains('masked')) {
+                        textEl.classList.remove('masked');
+                    }
+                });
+            }
+
+            applyFontSize();
+            return;
+        }
+
+        // 2) وضع الصفحات والمقاطع أو العرض المتصل
+        versesContainer.style.textAlign = 'justify';
+
+        let displayAyahs = ayahs;
+        let startIndex = 0;
+        let endIndex = ayahs.length;
+
+        if (quranState.viewMode === 'pages') {
+            const totalPages = Math.ceil(ayahs.length / quranState.pageSize) || 1;
+            if (quranState.currentPage >= totalPages) quranState.currentPage = totalPages - 1;
+            if (quranState.currentPage < 0) quranState.currentPage = 0;
+
+            startIndex = quranState.currentPage * quranState.pageSize;
+            endIndex = Math.min(startIndex + quranState.pageSize, ayahs.length);
+            displayAyahs = ayahs.slice(startIndex, endIndex);
+
+            if (paginationTop) paginationTop.style.display = 'flex';
+            if (paginationBottom) paginationBottom.style.display = 'flex';
+
+            const curPageStr = `صفحة ${toArabicDigits(quranState.currentPage + 1)} من ${toArabicDigits(totalPages)}`;
+            const rangeStr = `(الآيات ${toArabicDigits(startIndex + 1)} - ${toArabicDigits(endIndex)})`;
+
+            if (pageIndicatorTop) pageIndicatorTop.textContent = curPageStr;
+            if (pageIndicatorBottom) pageIndicatorBottom.textContent = curPageStr;
+            if (ayahRangeTop) ayahRangeTop.textContent = rangeStr;
+            if (ayahRangeBottom) ayahRangeBottom.textContent = rangeStr;
+
+            const isFirst = quranState.currentPage === 0;
+            const isLast = quranState.currentPage === totalPages - 1;
+
+            if (prevPageBtnTop) prevPageBtnTop.disabled = isFirst;
+            if (prevPageBtnBottom) prevPageBtnBottom.disabled = isFirst;
+            if (nextPageBtnTop) nextPageBtnTop.disabled = isLast;
+            if (nextPageBtnBottom) nextPageBtnBottom.disabled = isLast;
+
+            if (readingProgressBar) {
+                const pct = Math.round((endIndex / ayahs.length) * 100);
+                readingProgressBar.style.width = `${pct}%`;
+            }
+        } else {
+            // continuous
+            if (paginationTop) paginationTop.style.display = 'none';
+            if (paginationBottom) paginationBottom.style.display = 'none';
+            if (readingProgressBar) readingProgressBar.style.width = '100%';
+        }
 
         versesContainer.innerHTML = '';
         const fragment = document.createDocumentFragment();
 
-        ayahs.forEach((ayah, index) => {
+        displayAyahs.forEach((ayah, relIndex) => {
+            const absIndex = startIndex + relIndex;
             const span = document.createElement('span');
             span.className = 'quran-ayah';
-            span.setAttribute('data-index', index);
+            span.setAttribute('data-index', absIndex);
             span.setAttribute('data-ayah-num', ayah.numberInSurah);
+
+            if (absIndex === quranState.currentPlayingAyahIndex) {
+                span.classList.add('playing-ayah');
+            }
 
             const textSpan = document.createElement('span');
             textSpan.className = 'ayah-text';
@@ -1013,10 +1335,10 @@ function initMaqraahEngine() {
                 if (quranState.isBlindMode) {
                     span.classList.toggle('revealed');
                     if (e.target.closest('.ayah-num-symbol')) {
-                        playAyahByIndex(index);
+                        playAyahByIndex(absIndex);
                     }
                 } else {
-                    playAyahByIndex(index);
+                    playAyahByIndex(absIndex);
                 }
             });
 
@@ -1052,6 +1374,21 @@ function initMaqraahEngine() {
         }
 
         quranState.currentPlayingAyahIndex = index;
+
+        // انتقال تلقائي للصفحة أثناء التلاوة
+        if (quranState.viewMode === 'pages') {
+            const targetPage = Math.floor(index / quranState.pageSize);
+            if (targetPage !== quranState.currentPage) {
+                quranState.currentPage = targetPage;
+                renderVersesView();
+            }
+        } else if (quranState.viewMode === 'focus') {
+            if (quranState.currentFocusAyahIndex !== index) {
+                quranState.currentFocusAyahIndex = index;
+                renderVersesView();
+            }
+        }
+
         const ayah = quranState.ayahsData[index];
         const audioUrl = getAyahAudioUrl(quranState.currentReciter, quranState.currentSurah, ayah.numberInSurah);
 
@@ -1070,6 +1407,12 @@ function initMaqraahEngine() {
                 currentAyahEl.classList.add('revealed');
             }
             currentAyahEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        // تحديث زر الاستماع في بطاقة التركيز
+        const focusPlayBtn = document.getElementById('focusPlayCurrentBtn');
+        if (focusPlayBtn) {
+            focusPlayBtn.innerHTML = '<i class="fa-solid fa-pause"></i> <span>إيقاف مؤقت</span>';
         }
 
         if (floatingAudioBar) floatingAudioBar.style.display = 'block';
@@ -1122,7 +1465,8 @@ function initMaqraahEngine() {
 
     function togglePlaySurah() {
         if (!quranState.audioPlayer || !quranState.audioPlayer.src || quranState.currentPlayingAyahIndex === -1) {
-            playAyahByIndex(0);
+            const startIdx = quranState.viewMode === 'focus' ? quranState.currentFocusAyahIndex : (quranState.currentPage * quranState.pageSize);
+            playAyahByIndex(startIdx);
             return;
         }
 
@@ -1136,6 +1480,10 @@ function initMaqraahEngine() {
                 audioPlayPauseBtn.innerHTML = '<i class="fa-solid fa-play"></i>';
                 audioPlayPauseBtn.title = 'تشغيل';
             }
+            const focusPlayBtn = document.getElementById('focusPlayCurrentBtn');
+            if (focusPlayBtn) {
+                focusPlayBtn.innerHTML = '<i class="fa-solid fa-play"></i> <span>متابعة</span>';
+            }
         } else {
             quranState.audioPlayer.play().then(() => {
                 quranState.isPlaying = true;
@@ -1145,6 +1493,10 @@ function initMaqraahEngine() {
                 if (audioPlayPauseBtn) {
                     audioPlayPauseBtn.innerHTML = '<i class="fa-solid fa-pause"></i>';
                     audioPlayPauseBtn.title = 'إيقاف مؤقت';
+                }
+                const focusPlayBtn = document.getElementById('focusPlayCurrentBtn');
+                if (focusPlayBtn) {
+                    focusPlayBtn.innerHTML = '<i class="fa-solid fa-pause"></i> <span>إيقاف مؤقت</span>';
                 }
             }).catch(() => {});
         }
@@ -1160,6 +1512,11 @@ function initMaqraahEngine() {
         quranState.currentAyahPlayRepeat = 0;
 
         document.querySelectorAll('.quran-ayah.playing-ayah').forEach(el => el.classList.remove('playing-ayah'));
+
+        const focusPlayBtn = document.getElementById('focusPlayCurrentBtn');
+        if (focusPlayBtn) {
+            focusPlayBtn.innerHTML = '<i class="fa-solid fa-play"></i> <span>استماع وتكرار</span>';
+        }
 
         if (floatingAudioBar) floatingAudioBar.style.display = 'none';
         if (stopBtn) stopBtn.style.display = 'none';
